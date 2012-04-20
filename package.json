@@ -1,0 +1,14 @@
+{
+  "author": "Peter Braden <hi@peterbraden.co.uk> (peterbraden.co.uk)",
+  "name": "accountant",
+  "description": "Double Entry Accounting",
+  "version": "0.0.0",
+  "repository": {
+    "url": ""
+  },
+  "engines": {
+    "node": "~0.6.6"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
