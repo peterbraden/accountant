@@ -106,8 +106,10 @@ var statement = function(statement, banks){
 
 
 
-exports.run = function(){
-  var accts = JSON.parse(fs.readFileSync('./accounts.json', 'utf8').replace(/\/\/.*\n/g, '')) //strip comments
+exports.run = function(file){
+  file = file || './accounts.json'
+
+  var accts = JSON.parse(fs.readFileSync(file, 'utf8').replace(/\/\/.*\n/g, '')) //strip comments
     , stocks = {}
     , banks = {}
 

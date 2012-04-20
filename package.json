@@ -2,7 +2,7 @@
   "author": "Peter Braden <hi@peterbraden.co.uk> (peterbraden.co.uk)",
   "name": "accountant",
   "description": "Double Entry Accounting",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "repository": {
     "url": ""
   },
@@ -16,4 +16,8 @@
   
   "devDependencies": {},
   "main": "./accountant.js"
+  , "bin" : {
+    "acct-ls" : "./scripts/ls.js"
+  }
+
 }
