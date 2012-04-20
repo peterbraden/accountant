@@ -115,7 +115,6 @@ exports.run = function(file){
 
   for (var i=0; i<accts.length; i++){
     var acct = accts[i];
-  
     if (acct.typ== 'stock-buy' || acct.typ == 'etf-buy'){
       equityBuy(acct, stocks, banks);
     }

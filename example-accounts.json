@@ -1,0 +1,7 @@
+[ {"date" : "2012-01-02", "typ" : "statement", "acct" : "mybank", "balance" : 0, "currency" : "USD"}
+, {"date" : "2012-01-03", "typ" : "transaction", "src" : "myjob",  "dest" : "mybank", "amount" : 1000.01, "currency" : "USD"}
+, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "foo", "amount" : 20, "currency" : "USD"}
+, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "foo", "amount" : 10.99, "currency" : "USD"}
+, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "foo", "amount" : 51.50, "currency" : "USD"}
+, {"date" : "2012-01-02", "typ" : "statement", "acct" : "mybank", "balance" : 917.52, "currency" : "USD"}
+]
