@@ -10,9 +10,10 @@
     "node": "~0.6.6"
   },
   "dependencies": {
-      "colors" : "0.3.0"
+      "colors" : "0.6.0"
     , "underscore" : "1.3.1"
     , "nomnom" : "1.5.1"
+    , "cli-table" : "0.0.1"
     
   },
   
@@ -20,6 +21,7 @@
   "main": "./accountant.js"
   , "bin" : {
     "acct-ls" : "./scripts/ls.js"
+  ,  "acct-stock" : "./scripts/daily-stock.js"
   }
 
 }

@@ -5,7 +5,7 @@ var fs = require('fs')
   , opts = require('nomnom').parse()
   , Table = require('cli-table')
   
-  , ac = require('accountant')
+  , ac = require('../accountant')
   
 
 
@@ -34,9 +34,9 @@ var COLS = {
   , ret:     {title: "Return", ind : 12, desc: "Overall return (%)"}
 }
 		
-		
-		
-ac.registerReport({
+module.exports = function(){
+			
+  return {
   onComplete: function(banks, stocks){
     // current values
 
@@ -58,7 +58,8 @@ ac.registerReport({
     })
 
   }
-}).run()		
+}
+}
 		
 
 
@@ -80,14 +81,15 @@ var render = function(banks, stocks){
       head : _.map(COLS, function(v, k){return v.title})
     , style : {compact: true, 'padding-left':1, head: ['cyan']}
   })
-
-  var MKT_RET = _.find(stocks, function(v,k){return (k =='VTI')})
+  
+  var MKT_RET = _.find(stocks, function(v,k){
+    return (k =='VTI')} )|| {quantity : 1, current : 0, dividend : 0, cost_basis: 0}
   MKT_RET = (MKT_RET.quantity * MKT_RET.current + MKT_RET.dividend - MKT_RET.cost_basis)/MKT_RET.cost_basis * 100
 
   var mktCol = function(val){
     if (opts.color!=false && val > 0 && val < MKT_RET){
-	  return ('' + parseInt(val*100)/100).yellow	  
-	}	
+	    return ('' + parseInt(val*100)/100).yellow	  
+	  }	
     return c(val);
   }	  
 
@@ -102,7 +104,7 @@ var render = function(banks, stocks){
     , chg_p: c(v.change_percent, '', '%')
     , d_gain: c(parseFloat(v.change) * v.quantity)
     , num: c(v.quantity)
-	, age: v.chunks && (/*(v.chunks[0].quantity + '').blue + ' ' +*/ (age + '')[(age < 360) ? 'yellow' : 'green']) || ''
+	  , age: v.chunks && (/*(v.chunks[0].quantity + '').blue + ' ' +*/ (age + '')[(age < 360) ? 'yellow' : 'green']) || ''
     , cb: c(v.cost_basis)
     , mkt: c(v.quantity * v.current)
     , div: c(v.dividend)
@@ -110,10 +112,11 @@ var render = function(banks, stocks){
     , growth: c((v.quantity * v.current - v.cost_basis)/v.cost_basis * 100)
     , ret: mktCol((v.quantity * v.current + v.dividend - v.cost_basis)/v.cost_basis * 100)
 	}
-
+  
     return _.map(COLS, function(v, k){return vals[k]})
   }))
   
+  /*
   // Cash?
   if (opts.cash){
     currencies = {}
@@ -144,6 +147,7 @@ var render = function(banks, stocks){
     })  
   
   }
+  */
   
   var stripcolor = /\u001b\[\d+m/g
     , parse = function(a){return parseFloat(("" + a).replace(stripcolor,'')) || 0}
@@ -165,24 +169,28 @@ var render = function(banks, stocks){
     
     
   // Total
-  t.push([], 
-    [ "Total"
-    , ""
-	, ""
-    , c(tot_change / tot_cb * 100) //tot change %
-    , c(tot_day_gain)
-    , ""
-	, ""
-    , c(tot_cb)
-    , c(tot_val)
-    , c(tot_div)
-    , c(tot_gain)
-    , c(tot_growth_return)
-    , c(tot_return)
-    ])
+  var tots = {
+        symbol: "Total"
+      , price:  ""
+      , chg: ""
+      , chg_p: c(tot_change / tot_cb * 100) //tot change %
+      , d_gain: c(tot_day_gain)
+      , num: ""
+   	  , age: ""
+      , cb: c(tot_cb)
+      , mkt: c(tot_val)
+      , div: c(tot_div)
+      , gain: c(tot_gain)
+      , growth: c(tot_growth_return)
+      , ret: c(tot_return)
+     }
   
+  t.push([], _.map(COLS, function(v, k){return tots[k]}))
+
   
+
   console.log(t.toString())
+  
   
   // Trading Accounts
   if (opts.trad_acct){
@@ -200,3 +208,4 @@ var render = function(banks, stocks){
   
   
 }  
+
