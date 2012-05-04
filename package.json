@@ -18,10 +18,16 @@
   },
   
   "devDependencies": {},
+  
   "main": "./accountant.js"
+  
   , "bin" : {
-    "acct-ls" : "./scripts/ls.js"
-  ,  "acct-stock" : "./scripts/daily-stock.js"
+      "acct-ls" : "./scripts/ls.js"
+    , "acct-stock" : "./scripts/daily-stock.js"
+  }
+  
+  , "scripts": {
+    "test": "node test/smoke.js"
   }
 
 }
