@@ -1,4 +1,6 @@
 # Accountant
+[![Build Status](https://secure.travis-ci.org/peterbraden/accountant.png)](http://travis-ci.org/peterbraden/accountant)
+
 ## Double Entry Accounting
 
 _Accountant_ is a set of utilities and scripts that I've developed to allow
