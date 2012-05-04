@@ -1,14 +1,8 @@
-var fs = require('fs')
-  , request = require('request')
+var request = require('request')
   , _ = require('underscore')
   , colors = require('colors')
-  , opts = require('nomnom').parse()
   , Table = require('cli-table')
-  
-  , ac = require('../accountant')
-  
-
-
+    
 
 var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
   , EXCHANGE_RATES = {
@@ -30,11 +24,12 @@ var COLS = {
   , mkt :    {title: "Mkt Value", ind : 8, desc : "Market value of owned"}
   , div :    {title: "Div.", ind: 9, desc :"Dividends Paid"}
   , gain :   {title:  "Gain", ind : 10, desc: "Overall gain (price)"}
-  , growth:  {title:  "Growth", ind : 11, desc: "Growth % (no dividends)"}
-  , ret:     {title: "Return", ind : 12, desc: "Overall return (%)"}
+  , sec:     {title: "30d%", ind : 11, desc: "30 Day Yield (%)"}
+  , growth:  {title:  "Growth", ind : 12, desc: "Growth % (no dividends)"}
+  , ret:     {title: "Return", ind : 13, desc: "Overall return (%)"}
 }
 		
-module.exports = function(){
+module.exports = function(opts){
 			
   return {
   onComplete: function(banks, stocks){
@@ -54,7 +49,7 @@ module.exports = function(){
        })
 
 
-       render(banks, stocks)
+       render(banks, stocks, opts)
     })
 
   }
@@ -64,19 +59,22 @@ module.exports = function(){
 
 
 
-var c = function(v, pre, post){
-  var val = '' + parseInt(v*100)/100
-    , str = (pre || '') + val + (post || '')
+
+
+var render = function(banks, stocks, opts){
   
-  if (opts.color != false)
-    str = (val>=0) ? str.green : str.red  
   
-  return str
-}  
+  var c = function(v, pre, post){
+    var val = '' + parseInt(v*100)/100
+      , str = (pre || '') + val + (post || '')
 
+    if (opts.color != false)
+      str = (val>=0) ? str.green : str.red  
 
+    return str
+  }  
 
-var render = function(banks, stocks){
+  
   var t = new Table({
       head : _.map(COLS, function(v, k){return v.title})
     , style : {compact: true, 'padding-left':1, head: ['cyan']}
@@ -96,7 +94,9 @@ var render = function(banks, stocks){
   t.push.apply(t, _.map(stocks, function(v, k){
     
     var age = v.chunks ? parseInt((new Date().getTime() - new Date(v.chunks[0].date).getTime())/(1000*3600*24)) : ''
-
+      , gain = v.quantity * v.current + v.dividend - v.cost_basis
+      , ret = (gain)/v.cost_basis
+      
     var vals = {
       symbol: v.etf ? k.yellow : k
     , price:  c(v.current)
@@ -104,14 +104,17 @@ var render = function(banks, stocks){
     , chg_p: c(v.change_percent, '', '%')
     , d_gain: c(parseFloat(v.change) * v.quantity)
     , num: c(v.quantity)
-	  , age: v.chunks && (/*(v.chunks[0].quantity + '').blue + ' ' +*/ (age + '')[(age < 360) ? 'yellow' : 'green']) || ''
+	  , age: v.chunks && ((age + '')[(age < 360) ? 'yellow' : 'green']) || ''
     , cb: c(v.cost_basis)
     , mkt: c(v.quantity * v.current)
     , div: c(v.dividend)
-    , gain: c(v.quantity * v.current + v.dividend - v.cost_basis)
+    , gain: c(gain)
     , growth: c((v.quantity * v.current - v.cost_basis)/v.cost_basis * 100)
-    , ret: mktCol((v.quantity * v.current + v.dividend - v.cost_basis)/v.cost_basis * 100)
-	}
+    , ret: mktCol(ret * 100)
+	  }
+    
+    vals.sec = c((gain / age * 30) / v.cost_basis * 100)
+
   
     return _.map(COLS, function(v, k){return vals[k]})
   }))
@@ -152,19 +155,12 @@ var render = function(banks, stocks){
   var stripcolor = /\u001b\[\d+m/g
     , parse = function(a){return parseFloat(("" + a).replace(stripcolor,'')) || 0}
     , sum = function(a,b){return parse(a)+parse(b)}
-    , tot_change = _.reduce(_.pluck(t, 1), sum)
-    , tot_cb =  _.reduce(_.pluck(t, 7), sum)
-    , tot_val =  _.reduce(_.pluck(t, 8), sum)
-    , tot_day_gain = _.reduce(_.pluck(t, 4), sum)
-    , tot_div = _.reduce(_.pluck(t, 9), sum)
-    , tot_gain = _.reduce(_.pluck(t, 10), sum)
-    , tot_growth_return = (tot_val - tot_cb)/tot_cb * 100
-    , tot_return = (tot_val + tot_div - tot_cb)/tot_cb * 100
-    
+    , sumCol = function(col){return _.reduce(_.pluck(t, COLS[col].ind), sum)}
+    , num_rows = t.length
     
     // Sort
     t.sort(function(a, b){    
-      return parse(b[opts.sort || 12]) - parse(a[opts.sort || 12])
+      return parse(b[opts.sort ||COLS['ret'].ind]) - parse(a[opts.sort || COLS['ret'].ind])
     })
     
     
@@ -173,16 +169,17 @@ var render = function(banks, stocks){
         symbol: "Total"
       , price:  ""
       , chg: ""
-      , chg_p: c(tot_change / tot_cb * 100) //tot change %
-      , d_gain: c(tot_day_gain)
+      , chg_p: c((sumCol('chg_p') / num_rows), '', '%')  //tot change %
+      , d_gain: c(sumCol('d_gain'))
       , num: ""
    	  , age: ""
-      , cb: c(tot_cb)
-      , mkt: c(tot_val)
-      , div: c(tot_div)
-      , gain: c(tot_gain)
-      , growth: c(tot_growth_return)
-      , ret: c(tot_return)
+      , cb: c(sumCol('cb'))
+      , mkt: c(sumCol('mkt'))
+      , div: c(sumCol('div'))
+      , gain: c(sumCol('gain'))
+      , sec : c(sumCol('sec') / num_rows)
+      , growth: c( (sumCol('mkt') - sumCol('cb')) / sumCol('cb')  * 100, '', '%')
+      , ret: c( (sumCol('mkt') + sumCol('div') - sumCol('cb')) / sumCol('cb')  * 100, '', '%')
      }
   
   t.push([], _.map(COLS, function(v, k){return tots[k]}))
