@@ -54,6 +54,11 @@ var equityBuy = function(buy, stocks, banks){
 
     banks[buy.account] = banks[buy.account] || {balance:0}
     banks[buy.account].balance -= cb
+    banks[buy.account].positions = banks[buy.account].positions || {}
+	if (!banks[buy.account].positions[buy.symbol]){
+	  banks[buy.account].positions[buy.symbol] = 0
+	}
+	banks[buy.account].positions[buy.symbol] += buy.quantity 
   
     banks[buy.account].trading = true
 	  stocks[buy.symbol].etf = (buy.typ =='etf-buy')
@@ -69,8 +74,8 @@ var equityBuy = function(buy, stocks, banks){
 
 var dividend = function(div, stocks, banks){
    var s = stocks[div.symbol]
-      , net = s.quantity * div.amount
-  
+	 , bank = banks[div.account] || {}
+     , net = bank.positions[div.symbol] * div.amount
     s.dividend += net
   
     banks[div.account] = banks[div.account] || {}
@@ -80,7 +85,7 @@ var dividend = function(div, stocks, banks){
   
     _.each(reports, function(r){
       if (r.onDividend) 
-        r.onDividend(div, stocks);
+        r.onDividend(div, banks, stocks);
     })
 }  
 

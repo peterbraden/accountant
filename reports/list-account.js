@@ -16,9 +16,10 @@ module.exports = function(opts) {
         console.log(ac.pad(stock.symbol, 5), 'Buy'.red, stock.quantity, stock.cost, ": $", ac.c(stock.cb))
     }
     
-  , onDividend : function(acct, stocks){
+  , onDividend : function(acct, banks, stocks){
       var s = stocks[acct.symbol]
-        , net = parseInt(s.quantity * acct.amount * 100) / 100
+        , positions = banks[acct.account].positions
+		, net = parseInt(positions[acct.symbol] * acct.amount * 100) / 100
         
       if (SHOW_DIVIDENDS)
         console.log(ac.pad(acct.symbol, 5), "Div".blue, acct.date, s.quantity, acct.amount, ": $", net)
