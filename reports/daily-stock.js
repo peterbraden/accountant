@@ -17,7 +17,7 @@ var COLS = {
   , price :  {title : "Price", ind : 1}
   , chg :    {title : "Δ", ind : 2, desc : "Daily change (price)"}
   , chg_p :  {title: "Δ%", ind: 3, desc : "Daily change (%)"}
-  , d_gain : {title: "Day Gain", ind: 4, desc : "Day gain (price)"}
+  , d_gain : {title: "$Δ", ind: 4, desc : "Day gain (price)"}
   , num :    {title: "#", ind : 5, desc : "No. Shares owned"}
   , age :    {title: ">age", ind : 6 , desc: "Age of oldest shares (days)"}
   , cb :     {title: "Cst Bas.", ind: 7, desc: "Cost basis"}
@@ -73,6 +73,17 @@ var render = function(banks, stocks, opts){
 
     return str
   }  
+  
+  // Color volatile
+  var cv = function(v, pre, post, bord){
+    var val = '' + parseInt(v*100)/100
+      , str = (pre || '') + val + (post || '')
+
+    if (opts.color != false)
+      str = (val>=0) ? str.green : ((val <= bord) ? str.red : str.yellow)  
+
+    return str
+  }  
 
   
   var t = new Table({
@@ -96,13 +107,13 @@ var render = function(banks, stocks, opts){
     var age = v.chunks ? parseInt((new Date().getTime() - new Date(v.chunks[0].date).getTime())/(1000*3600*24)) : ''
       , gain = v.quantity * v.current + v.dividend - v.cost_basis
       , ret = (gain)/v.cost_basis
-      
+
     var vals = {
       symbol: v.etf ? k.yellow : k
     , price:  c(v.current)
-    , chg: c(v.change)
-    , chg_p: c(v.change_percent, '', '%')
-    , d_gain: c(parseFloat(v.change) * v.quantity)
+    , chg: cv(parseFloat(v.change), '', '', (-0.02 * v.current))
+    , chg_p: cv(v.change_percent, '', '%', -2)
+    , d_gain: cv(parseFloat(v.change) * v.quantity, '', '', (-0.02 * v.current * v.quantity))
     , num: c(v.quantity)
 	  , age: v.chunks && ((age + '')[(age < 360) ? 'yellow' : 'green']) || ''
     , cb: c(v.cost_basis)
@@ -169,7 +180,7 @@ var render = function(banks, stocks, opts){
         symbol: "Total"
       , price:  ""
       , chg: ""
-      , chg_p: c((sumCol('chg_p') / num_rows), '', '%')  //tot change %
+      , chg_p: cv((sumCol('chg_p') / num_rows), '', '%')  //tot change %
       , d_gain: c(sumCol('d_gain'))
       , num: ""
    	  , age: ""
