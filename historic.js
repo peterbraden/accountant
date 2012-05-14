@@ -50,7 +50,7 @@ var getRemote = function(symbol, start, end, cb){
   request.get(
       mustache.to_html(HIST_URL
         , {
-            stock : 'GOOG'
+            stock : symbol
           , start : start
           , end : end
         })
@@ -127,6 +127,8 @@ exports.listCache = function(){
 
 }
 
-exports.getData('MAIN', console.log)
-exports.listCache();
-
+exports.priceAt = function(symbol, date, cb){
+  exports.getData(symbol, function(data){
+    cb(data[date] ? data[date].open : -1)
+  })
+}

@@ -10,6 +10,7 @@ var fs = require('fs')
 
 var reports = []
 
+exports.historic = require('./historic')
 
 
 exports.registerReport = function(report){
@@ -147,7 +148,7 @@ exports.run = function(file){
 
 
 
-
+// === Utility Functions ===
 
 exports.c = function(v, pre, post){
   var val = '' + parseInt(v*100)/100
@@ -168,3 +169,14 @@ exports.pad = function(v, len, ch){
   }	  
   return val	  
 }	
+
+
+// Age of oldest stocks in days
+exports.stockMaxAge = function(stock){
+ return parseInt((new Date().getTime() - new Date(stock.chunks[0].date).getTime())/(1000*3600*24))
+}
+
+// $ gain of stock
+exports.stockGain = function(stock){
+ return stock.quantity * stock.current + stock.dividend - stock.cost_basis
+}

@@ -2,7 +2,7 @@ var request = require('request')
   , _ = require('underscore')
   , colors = require('colors')
   , Table = require('cli-table')
-    
+  , ac = require('../accountant')  
 
 var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
   , EXCHANGE_RATES = {
@@ -104,9 +104,17 @@ var render = function(banks, stocks, opts){
 
   t.push.apply(t, _.map(stocks, function(v, k){
     
-    var age = v.chunks ? parseInt((new Date().getTime() - new Date(v.chunks[0].date).getTime())/(1000*3600*24)) : ''
-      , gain = v.quantity * v.current + v.dividend - v.cost_basis
+    var age = ac.stockMaxAge(v)
+      , gain = ac.stockGain(v)
       , ret = (gain)/v.cost_basis
+      
+      /*
+      _.each(v.chunks, function(ch){
+        ac.historic.priceAt('VTI', ch.date, function(){
+          console.log(arguments)
+        })
+      })
+      */
 
     var vals = {
       symbol: v.etf ? k.yellow : k
@@ -130,7 +138,7 @@ var render = function(banks, stocks, opts){
     return _.map(COLS, function(v, k){return vals[k]})
   }))
   
-  /*
+  
   // Cash?
   if (opts.cash){
     currencies = {}
@@ -143,25 +151,27 @@ var render = function(banks, stocks, opts){
     })
 
     _.each(currencies, function(v,k){
-      t.push(
-        [ k.yellow
-        , c(EXCHANGE_RATES[k])
-        , ''
-        , ''
-        , c(v)
-        , c(EXCHANGE_RATES[k] * v)
-        , c(EXCHANGE_RATES[k] * v)
-        , ''
-        , ''
-        , ''
-        , ''
-        , ''
-		, ''
-      ])
+      var r ={
+         symbol: k.blue
+        , price: c(EXCHANGE_RATES[k])
+        , chg: c(0)
+        , chg_p : c(0)
+        , d_gain : c(0)
+        , num : c(v)
+        , age : '-'
+        , cb : c(EXCHANGE_RATES[k] * v)
+        , mkt : c(EXCHANGE_RATES[k] * v)
+        , div : c(0)
+        , gain: c(0)
+        , sec : c(0)
+        , growth: c(0)
+        , ret: c(0)
+      }
+      t.push(_.map(COLS, function(v, k){return r[k]}))
     })  
   
   }
-  */
+  
   
   var stripcolor = /\u001b\[\d+m/g
     , parse = function(a){return parseFloat(("" + a).replace(stripcolor,'')) || 0}
