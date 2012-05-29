@@ -29,7 +29,6 @@ module.exports = function(opts){
       _.each(banks, function(b, k){
         if (!b.balance || !b.last_statement) return;
 
-        console.log(k, b, b.balance, cash)  
         cash += b.balance
         net_worth += b.balance
       })
