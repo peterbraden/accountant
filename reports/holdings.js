@@ -34,7 +34,7 @@ module.exports = function(opts){
       })
 
       assets.push({
-          symbol: "Cash"
+          symbol: "Cash".yellow
         , cost_basis: cash
       })
 
@@ -46,7 +46,11 @@ module.exports = function(opts){
         net_equity += s.cost_basis
 
       })
-      
+
+      assets.sort(function(a, b){
+        return b.cost_basis - a.cost_basis
+      })
+
       _.each(assets, function(x){
         t.push([x.symbol
           , ac.c(x.cost_basis)
