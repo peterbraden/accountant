@@ -76,10 +76,16 @@ var equityBuy = function(buy, stocks, banks){
 
 var dividend = function(div, stocks, banks){
    var s = stocks[div.symbol]
-	 , bank = banks[div.account] || {}
-     , net = bank.positions[div.symbol] * div.amount
+	   , bank = banks[div.account] || {}
+     , net
+
+    if (div.amount){
+      net = bank.positions[div.symbol] * div.amount
+    } else {
+      net = div.gross
+    }
+
     s.dividend += net
-  
     banks[div.account] = banks[div.account] || {}
     banks[div.account].balance += net
   
