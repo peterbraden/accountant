@@ -17,12 +17,17 @@ module.exports = function(opts) {
     }
     
   , onDividend : function(acct, banks, stocks){
-      var s = stocks[acct.symbol]
+    var s = stocks[acct.symbol]
         , positions = banks[acct.account].positions
-		, net = parseInt(positions[acct.symbol] * acct.amount * 100) / 100
+		    , net = parseInt(positions[acct.symbol] * acct.amount * 100) / 100
         
-      if (SHOW_DIVIDENDS)
+      if (acct.gross){
+        acct.amount = parseInt(acct.gross/s.quantity * 100)/100
+        net = acct.gross
+      }
+      if (SHOW_DIVIDENDS){
         console.log(ac.pad(acct.symbol, 5), "Div".blue, acct.date, s.quantity, acct.amount, ": $", net)
+      }    
   }
   
   , onTransaction : function(acct, banks){
