@@ -22,8 +22,9 @@ module.exports = function(opts){
     _.each(banks, function(v, k){
       if (!v.balance || !v.last_statement)
         return;
-
-      var dollar_balance = v.balance
+      
+      var age = parseInt((new Date().getTime() - new Date(v.last_statement).getTime())/(1000*3600*24))  
+        , dollar_balance = v.balance
         , liquid = v.balance
 
       var s = _.filter(stocks, function(x){return x.brokerage == k});
@@ -35,6 +36,12 @@ module.exports = function(opts){
 
       dollar_balance = dollar_balance * EXCHANGE_RATES[v.currency]
       liquid = liquid * EXCHANGE_RATES[v.currency]
+
+      if (age > 60){
+        k = k.red
+      } else if (age > 30){
+        k = k.yellow
+      }
 
       vals.push([k, dollar_balance, liquid])
     })
