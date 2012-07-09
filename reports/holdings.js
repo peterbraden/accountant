@@ -54,7 +54,7 @@ module.exports = function(opts){
       })
 
       assets.sort(function(a, b){
-        return b.cost_basis - a.cost_basis
+        return (b.current*b.quantity) - (a.current*a.quantity)
       })
 
       _.each(assets, function(x){
