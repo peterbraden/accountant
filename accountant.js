@@ -166,6 +166,15 @@ exports.c = function(v, pre, post){
   return str
 }  
 
+exports.$ = function(v, curr){
+  var val = parseInt(v*100)/100
+    , dol = parseInt(val)
+    , cen = exports.pad(parseInt(val % 1), 2, '0')
+    , dols = (dol + '').replace(/(\d)(?=(\d\d\d)+$)/, "$1,")
+    , str = (curr || "$") + dols + "." + cen
+  str = (val>=0) ? str.green : str.red  
+  return str
+}
 
 
 exports.pad = function(v, len, ch){

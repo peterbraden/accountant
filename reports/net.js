@@ -4,7 +4,8 @@ var request = require('request')
   , ac = require('../accountant') 
   , vals = []
   , c = ac.c
-  
+  , $$ = ac.$
+
 var EXCHANGE_RATES = {
       USD : 1 // To USD
     , GBP : 1.5723 
@@ -51,10 +52,10 @@ module.exports = function(opts){
       , tot_liq= _.reduce(_.pluck(vals, 2), function(x, y){return x+y}, 0);
 
     _.each(vals, function(v){
-      t.push([v[0], c(v[1]), c(v[2]), c(v[1]/tot_val * 100)])
+      t.push([v[0], $$(v[1]), $$(v[2]), c(v[1]/tot_val * 100)])
     })
     t.push([]);
-    t.push(['Total', c(tot_val), c(tot_liq), '']);
+    t.push(['Total', $$(tot_val), $$(tot_liq), '']);
     
     console.log(t.toString())
 
