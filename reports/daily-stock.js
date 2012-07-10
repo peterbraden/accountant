@@ -33,24 +33,10 @@ module.exports = function(opts){
 			
   return {
   onComplete: function(banks, stocks){
-    // current values
+  ac.loadPrices(stocks, function(st){
+    render(banks, st, opts)
+  })
 
-    request.get({uri:FINANCE_URL + _(stocks).keys().join(',')}, function(err, resp, body){
-      if (!body) throw "Could not get data from API"
-      var finances = JSON.parse(body.slice(3))
-
-       _.each(finances, function(v, k){
-         stocks[v.t].current = v.l_cur
-         stocks[v.t].change = v.c
-         stocks[v.t].change_percent = v.cp
-
-
-         //console.log(v.t, v)
-       })
-
-
-       render(banks, stocks, opts)
-    })
 
   }
 }

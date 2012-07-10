@@ -7,7 +7,8 @@
 var fs = require('fs')
   , colors = require('colors')
   , _ = require('underscore')
-
+  , request = require('request')
+   
 var reports = []
 
 exports.historic = require('./historic')
@@ -180,3 +181,23 @@ exports.stockMaxAge = function(stock){
 exports.stockGain = function(stock){
  return stock.quantity * stock.current + stock.dividend - stock.cost_basis
 }
+
+
+var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
+exports.loadPrices = function(stocks, cb){
+  request.get({uri:FINANCE_URL + _(stocks).keys().join(',')}, function(err, resp, body){
+      if (!body) throw "Could not get data from API"
+      
+      var finances = JSON.parse(body.slice(3))
+
+       _.each(finances, function(v, k){
+         stocks[v.t].current = v.l_cur
+         stocks[v.t].change = v.c
+         stocks[v.t].change_percent = v.cp
+       })
+
+       cb(stocks)
+    })
+}
+
+
