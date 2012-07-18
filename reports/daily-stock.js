@@ -66,7 +66,7 @@ var render = function(banks, stocks, opts){
       , str = (pre || '') + val + (post || '')
 
     if (opts.color != false)
-      str = (val>=0) ? str.green : ((val <= bord) ? str.red : str.yellow)  
+      str = (val>=0) ? ((val>= -bord) ? str.blue : str.green) : ((val <= bord) ? str.red : str.yellow)  
 
     return str
   }  
