@@ -13,7 +13,7 @@ var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
   
 
 var COLS = {
-    symbol : {title : "Symbol", ind : 0}
+    symbol : {title : "Sym", desc: "Symbol", ind : 0}
   , price :  {title : "Price", ind : 1, align:'right'}
   , chg :    {title : "Δ", ind : 2, desc : "Daily change (price)", align:'right'}
   , chg_p :  {title: "Δ%", ind: 3, desc : "Daily change (%)", align:'right'}
@@ -74,10 +74,10 @@ var render = function(banks, stocks, opts){
   
   var t = new Table({
       head : _.map(COLS, function(v, k){return v.title})
-    , style : {compact: true, 'padding-left':1, head: ['cyan']}
-    , colAligns: [_.map(COLS, function(v, k){return v.align})]
+    , style : {compact: true, 'padding-left':1, 'padding-right':1 , head: ['cyan']}
+    , colAligns: _.map(COLS, function(v, k){return v.align || 'left'})
   })
-  
+ 
   var MKT_RET = _.find(stocks, function(v,k){
     return (k =='VTI')} )|| {quantity : 1, current : 0, dividend : 0, cost_basis: 0}
   MKT_RET = (MKT_RET.quantity * MKT_RET.current + MKT_RET.dividend - MKT_RET.cost_basis)/MKT_RET.cost_basis * 100
