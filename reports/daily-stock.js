@@ -75,7 +75,7 @@ var render = function(banks, stocks, opts){
   var t = new Table({
       head : _.map(COLS, function(v, k){return v.title})
     , style : {compact: true, 'padding-left':1, head: ['cyan']}
-    , colAligns: [_.map(COLS, function(v, k){return v.align || 'left'})]
+    , colAligns: [_.map(COLS, function(v, k){return v.align})]
   })
   
   var MKT_RET = _.find(stocks, function(v,k){
