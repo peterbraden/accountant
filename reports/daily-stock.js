@@ -110,7 +110,7 @@ var render = function(banks, stocks, opts){
     , chg_p: cv(v.change_percent, '', '%', -2)
     , d_gain: cv(parseFloat(v.change) * v.quantity, '', '', (-0.02 * v.current * v.quantity))
     , num: c(v.quantity)
-	  , age: v.chunks && ((age + '')[(age < 360) ? 'yellow' : 'green']) || ''
+	  , age: v.chunks && ((age + '')[(age < 365) ? 'yellow' : 'green']) || ''
     , cb: c(v.cost_basis)
     , mkt: c(v.quantity * v.current)
     , div: c(v.dividend)
