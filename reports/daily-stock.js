@@ -51,7 +51,7 @@ var render = function(banks, stocks, opts){
   
   
   var c = function(v, pre, post){
-    var val = '' + parseInt(v*100)/100
+    var val = '' + ac.r2(v)
       , str = (pre || '') + val + (post || '')
 
     if (opts.color != false)

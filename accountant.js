@@ -176,6 +176,16 @@ exports.$ = function(v, curr){
   return str
 }
 
+// Round to 2 decimal places
+exports.r2 = function(v){
+  if (v == 0){
+    return '0'
+  }
+
+  var w = parseInt(v)
+    , f = exports.pad(Math.abs(parseInt((v % 1) * 100)), 2, '0')
+  return  ((v<0 && w == 0) ? '-' : '') +  w + '.' + f
+}
 
 exports.pad = function(v, len, ch){
   var val = v + ''
