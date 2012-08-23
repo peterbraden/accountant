@@ -26,6 +26,7 @@
     , "acct-ls" : "./scripts/ls.js"
     , "acct-net" : "./scripts/net.js"
     , "acct-stock" : "./scripts/daily-stock.js"
+    , "acct-compound" : "./scripts/compound.js"
   }
   
   , "scripts": {
