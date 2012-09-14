@@ -48,6 +48,7 @@ var equityBuy = function(buy, stocks, banks){
     s.quantity += buy.quantity
 
 	  s.industry = s.industry || buy.industry
+	  s.asset_class = s.asset_class || buy.asset_class
 
   	s.chunks = s.chunks || []
   	s.chunks.push({date: buy.date, quantity: buy.quantity})
