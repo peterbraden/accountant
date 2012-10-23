@@ -40,6 +40,11 @@ var equityBuy = function(buy, stocks, banks){
     var s = stocks[buy.symbol] || {}
       , cb = ((buy.quantity * buy.cost) + buy.commission)
     
+    if (buy.gross){
+      cb = (buy.gross + buy.commission)
+      buy.cost = buy.gross / buy.quantity  
+    }
+
     s.quantity = s.quantity || 0
     s.dividend = s.dividend || 0
     s.cost_basis =  s.cost_basis || 0
