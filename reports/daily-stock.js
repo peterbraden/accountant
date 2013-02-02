@@ -13,20 +13,20 @@ var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
   
 
 var COLS = {
-    symbol : {title : "Symbol", ind : 0}
-  , price :  {title : "Price", ind : 1}
-  , chg :    {title : "Δ", ind : 2, desc : "Daily change (price)"}
-  , chg_p :  {title: "Δ%", ind: 3, desc : "Daily change (%)"}
-  , d_gain : {title: "$Δ", ind: 4, desc : "Day gain (price)"}
-  , num :    {title: "#", ind : 5, desc : "No. Shares owned"}
-  , age :    {title: ">age", ind : 6 , desc: "Age of oldest shares (days)"}
-  , cb :     {title: "Cst Bas.", ind: 7, desc: "Cost basis"}
-  , mkt :    {title: "Mkt Value", ind : 8, desc : "Market value of owned"}
-  , div :    {title: "Div.", ind: 9, desc :"Dividends Paid"}
-  , gain :   {title:  "Gain", ind : 10, desc: "Overall gain (price)"}
-  , sec:     {title: "30d%", ind : 11, desc: "30 Day Yield (%)"}
-  , growth:  {title:  "Growth", ind : 12, desc: "Growth % (no dividends)"}
-  , ret:     {title: "Return", ind : 13, desc: "Overall return (%)"}
+    symbol : {title : "Sym", desc: "Symbol", ind : 0}
+  , price :  {title : "Price", ind : 1, align:'right'}
+  , chg :    {title : "Δ", ind : 2, desc : "Daily change (price)", align:'right'}
+  , chg_p :  {title: "Δ%", ind: 3, desc : "Daily change (%)", align:'right'}
+  , d_gain : {title: "$Δ", ind: 4, desc : "Day gain (price)", align:'right'}
+  , num :    {title: "#", ind : 5, desc : "No. Shares owned", align:'right'}
+  , age :    {title: ">age", ind : 6 , desc: "Age of oldest shares (days)", align:'right'}
+  , cb :     {title: "Cst Bas.", ind: 7, desc: "Cost basis", align:'right'}
+  , mkt :    {title: "Mkt Value", ind : 8, desc : "Market value of owned", align:'right'}
+  , div :    {title: "Div.", ind: 9, desc :"Dividends Paid", align:'right'}
+  , gain :   {title:  "Gain", ind : 10, desc: "Overall gain (price)", align:'right'}
+  , sec:     {title: "30d%", ind : 11, desc: "30 Day Yield (%)", align:'right'}
+  , growth:  {title:  "Growth", ind : 12, desc: "Growth % (no dividends)", align:'right'}
+  , ret:     {title: "Return", ind : 13, desc: "Overall return (%)", align:'right'}
 }
 		
 module.exports = function(opts){
@@ -51,7 +51,7 @@ var render = function(banks, stocks, opts){
   
   
   var c = function(v, pre, post){
-    var val = '' + parseInt(v*100)/100
+    var val = '' + ac.r2(v)
       , str = (pre || '') + val + (post || '')
 
     if (opts.color != false)
@@ -66,7 +66,7 @@ var render = function(banks, stocks, opts){
       , str = (pre || '') + val + (post || '')
 
     if (opts.color != false)
-      str = (val>=0) ? str.green : ((val <= bord) ? str.red : str.yellow)  
+      str = (val>=0) ? ((val>= -bord) ? str.blue : str.green) : ((val <= bord) ? str.red : str.yellow)  
 
     return str
   }  
@@ -74,9 +74,10 @@ var render = function(banks, stocks, opts){
   
   var t = new Table({
       head : _.map(COLS, function(v, k){return v.title})
-    , style : {compact: true, 'padding-left':1, head: ['cyan']}
+    , style : {compact: true, 'padding-left':1, 'padding-right':1 , head: ['cyan']}
+    , colAligns: _.map(COLS, function(v, k){return v.align || 'left'})
   })
-  
+ 
   var MKT_RET = _.find(stocks, function(v,k){
     return (k =='VTI')} )|| {quantity : 1, current : 0, dividend : 0, cost_basis: 0}
   MKT_RET = (MKT_RET.quantity * MKT_RET.current + MKT_RET.dividend - MKT_RET.cost_basis)/MKT_RET.cost_basis * 100
@@ -109,7 +110,7 @@ var render = function(banks, stocks, opts){
     , chg_p: cv(v.change_percent, '', '%', -2)
     , d_gain: cv(parseFloat(v.change) * v.quantity, '', '', (-0.02 * v.current * v.quantity))
     , num: c(v.quantity)
-	  , age: v.chunks && ((age + '')[(age < 360) ? 'yellow' : 'green']) || ''
+	  , age: v.chunks && ((age + '')[(age < 365) ? 'yellow' : 'green']) || ''
     , cb: c(v.cost_basis)
     , mkt: c(v.quantity * v.current)
     , div: c(v.dividend)

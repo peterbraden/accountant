@@ -40,6 +40,11 @@ var equityBuy = function(buy, stocks, banks){
     var s = stocks[buy.symbol] || {}
       , cb = ((buy.quantity * buy.cost) + buy.commission)
     
+    if (buy.gross){
+      cb = (buy.gross + buy.commission)
+      buy.cost = buy.gross / buy.quantity  
+    }
+
     s.quantity = s.quantity || 0
     s.dividend = s.dividend || 0
     s.cost_basis =  s.cost_basis || 0
@@ -48,6 +53,7 @@ var equityBuy = function(buy, stocks, banks){
     s.quantity += buy.quantity
 
 	  s.industry = s.industry || buy.industry
+	  s.asset_class = s.asset_class || buy.asset_class
 
   	s.chunks = s.chunks || []
   	s.chunks.push({date: buy.date, quantity: buy.quantity})
@@ -169,13 +175,23 @@ exports.c = function(v, pre, post){
 exports.$ = function(v, curr){
   var val = parseInt(v*100)/100
     , dol = parseInt(val)
-    , cen = exports.pad(parseInt(val % 1), 2, '0')
+    , cen = exports.pad(Math.round((v % 1) * 100), 2, '0')
     , dols = (dol + '').replace(/(\d)(?=(\d\d\d)+$)/, "$1,")
     , str = (curr || "$") + dols + "." + cen
   str = (val>=0) ? str.green : str.red  
   return str
 }
 
+// Round to 2 decimal places
+exports.r2 = function(v){
+  if (v == 0){
+    return '0'
+  }
+
+  var w = parseInt(v)
+    , f = exports.pad(Math.abs(parseInt((v % 1) * 100)), 2, '0')
+  return  ((v<0 && w == 0) ? '-' : '') +  w + '.' + f
+}
 
 exports.pad = function(v, len, ch){
   var val = v + ''
