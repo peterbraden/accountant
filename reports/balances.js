@@ -37,5 +37,9 @@ module.exports = function(opts){
       }
 
     }
+  , onDividend: function(d){
+      checkMonth(d.date.slice(0,7));
+      currmonthData.income += d.net;
+    }
   }
 }

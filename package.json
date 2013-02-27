@@ -24,7 +24,7 @@
     "acct-net": "./scripts/net.js",
     "acct-stock": "./scripts/daily-stock.js",
     "acct-compound": "./scripts/compound.js",
-    "acct-mix": "./scripts/mix.js"
+    "acct-mix": "./scripts/mix.js",
     "acct-io": "./scripts/monthly-balances.js"
   },
   "scripts": {

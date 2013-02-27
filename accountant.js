@@ -91,6 +91,8 @@ var dividend = function(div, stocks, banks){
       net = div.gross
     }
 
+    div.net = net
+
     s.dividend += net
     banks[div.account] = banks[div.account] || {}
     banks[div.account].balance += net
@@ -134,7 +136,7 @@ exports.run = function(file){
 
   for (var i=0; i<accts.length; i++){
     var acct = accts[i];
-    if (acct.typ== 'stock-buy' || acct.typ == 'etf-buy'){
+    if (acct.typ== 'stock-buy' || acct.typ == 'etf-buy' || acct.typ == 'mutfund-buy'){
       equityBuy(acct, stocks, banks);
     }
   
@@ -222,7 +224,7 @@ exports.loadPrices = function(stocks, cb){
       var finances = JSON.parse(body.slice(3))
 
        _.each(finances, function(v, k){
-         stocks[v.t].current = v.l_cur
+         stocks[v.t].current = v.l_cur.replace('\$', '')
          stocks[v.t].change = v.c
          stocks[v.t].change_percent = v.cp
        })
