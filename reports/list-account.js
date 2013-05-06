@@ -2,6 +2,14 @@ var ac = require('../accountant')
   , colors = require('colors');
 
 
+var lastDate = 0
+var checkDate = function(d){
+  if (d < lastDate){
+    console.log("Out of order date:".red, d);
+  }
+  lastDate = d
+}
+
 
 module.exports = function(opts) {
   var SHOW_TRANSACTIONS = opts.showTransactions || false
@@ -31,6 +39,8 @@ module.exports = function(opts) {
   }
   
   , onTransaction : function(acct, banks){
+      checkDate(acct.date)
+
       if (SHOW_TRANSACTIONS)
         console.log(acct.date, acct.src, '->', acct.dest, ' : ', acct.amount, "(", ac.c(banks[acct.src].balance), ")")
   }

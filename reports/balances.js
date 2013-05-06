@@ -23,7 +23,7 @@ var checkMonth = function(mon){
 module.exports = function(opts){
   return {
     onComplete: function(banks, stocks){
-
+      checkMonth("-");
     }
     , onTransaction: function(t, banks, stocks){
       checkMonth(t.date.slice(0, 7));
