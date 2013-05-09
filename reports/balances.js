@@ -37,6 +37,13 @@ module.exports = function(opts){
       }
 
     }
+  , onEquityBuy: function(buy){
+    checkMonth(buy.date.slice(0, 7));
+    currmonthData.outgoing -= buy.cb;
+    if (currmonthData.outgoing < 0) currmonthData.outgoing = 0
+    // Hacky - basically don't include stock purchases as 'outgoing' transactions
+    // by reversing the amount
+  }
   , onDividend: function(d){
       checkMonth(d.date.slice(0,7));
       currmonthData.income += d.net;
