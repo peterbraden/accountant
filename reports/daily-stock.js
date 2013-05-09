@@ -104,7 +104,7 @@ var render = function(banks, stocks, opts){
       */
 
     var vals = {
-      symbol: v.etf ? k.yellow : k
+      symbol: (v.etf || v.mutual_fund) ? k.yellow : k
     , price:  c(v.current)
     , chg: cv(parseFloat(v.change), '', '', (-0.02 * v.current))
     , chg_p: cv(v.change_percent, '', '%', -2)
