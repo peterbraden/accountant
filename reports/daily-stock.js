@@ -93,7 +93,7 @@ var render = function(banks, stocks, opts){
     
     var age = ac.stockMaxAge(v)
       , gain = ac.stockGain(v)
-      , ret = (gain)/v.cost_basis
+      , ret = (gain + v.dividend)/v.cost_basis
       
       /*
       _.each(v.chunks, function(ch){

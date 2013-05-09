@@ -34,7 +34,7 @@ module.exports = function(opts){
       if (s){
         _.each(s, function(v, k){
       	  dollar_balance += v.cost_basis
-          unrealised_gain += (v.current * v.quantity) - v.cost_basis;
+          unrealised_gain += ac.stockGain(v);
         })
       }
 

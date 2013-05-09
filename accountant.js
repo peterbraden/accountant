@@ -214,7 +214,7 @@ exports.stockMaxAge = function(stock){
  return parseInt((new Date().getTime() - new Date(stock.chunks[0].date).getTime())/(1000*3600*24))
 }
 
-// $ gain of stock
+// unrealised $ gain of stock
 exports.stockGain = function(stock){
  return stock.quantity * stock.current - stock.cost_basis
 }
