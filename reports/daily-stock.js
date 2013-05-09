@@ -119,7 +119,7 @@ var render = function(banks, stocks, opts){
     , ret: mktCol(ret * 100)
 	  }
     
-    vals.sec = c((gain / age * 30) / v.cost_basis * 100)
+    vals.sec = c(((gain + v.dividend)/ age * 30) / v.cost_basis * 100)
 
   
     return _.map(COLS, function(v, k){return vals[k]})
