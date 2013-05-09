@@ -216,7 +216,7 @@ exports.stockMaxAge = function(stock){
 
 // $ gain of stock
 exports.stockGain = function(stock){
- return stock.quantity * stock.current + stock.dividend - stock.cost_basis
+ return stock.quantity * stock.current - stock.cost_basis
 }
 
 
