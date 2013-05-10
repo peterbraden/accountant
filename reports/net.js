@@ -22,7 +22,7 @@ module.exports = function(opts){
     })
 
     _.each(banks, function(v, k){
-      if (!v.balance || !v.last_statement)
+      if (!v.last_statement)
         return;
 
       var age = parseInt((new Date().getTime() - new Date(v.last_statement).getTime())/(1000*3600*24))
@@ -47,6 +47,8 @@ module.exports = function(opts){
       } else if (age > 30){
         k = k.yellow
       }
+      if (!v.balance && !unrealised_gain)
+        return false;
 
       vals.push([k, dollar_balance, liquid, unrealised_gain])
     })
