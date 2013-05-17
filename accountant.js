@@ -60,7 +60,7 @@ var equityBuy = function(buy, stocks, banks){
 	  s.asset_class = s.asset_class || buy.asset_class
 
   	s.chunks = s.chunks || []
-  	s.chunks.push({date: buy.date, quantity: buy.quantity})
+  	s.chunks.push(buy)
   	
     stocks[buy.symbol] = s
 
@@ -97,15 +97,37 @@ var equitySell = function(sell, stocks, banks){
       amount = (sell.quantity * sell.price) - sell.commission
     }
 
+    sell.value = amount
 
     s.quantity = s.quantity - sell.quantity
 
 
-    s.chunks.push({date: buy.date, quantity: -sell.quantity})
+    sell.cb = 0
+    // FIFO
+    for (var i = 0, j = sell.quantity; i< s.chunks.length && j > 0; i++){
+      var chunk = s.chunks[i];
+      if (chunk.quantity > j){
+        chunk.quantity -= j;
+        sell.cb += j * chunk.cost
+        break;
+      } else {
+        s.chunks.splice(i, 1);
+        sell.cb += chunk.quantity * chunk.cost
+        j -= chunk.quantity;
+        //TODO
+      }
+    }
 
+
+    s.cost_basis -= sell.cb
     stocks[sell.symbol] = s
     banks[sell.account].balance -= amount
 	  banks[sell.account].positions[sell.symbol] -= sell.quantity
+
+    _.each(reports, function(r){
+      if (r.onEquitySell) 
+        r.onEquitySell(sell);
+    })
 }
 
 var dividend = function(div, stocks, banks){
@@ -168,7 +190,7 @@ exports.run = function(file){
       equityBuy(acct, stocks, banks);
     }
 
-    if (acct.typ== 'stock-sell' || acct.typ == 'etf-sell' || acct.typ == 'mutfund-sell'){
+    if (acct.typ == 'sell' || acct.typ== 'stock-sell' || acct.typ == 'etf-sell' || acct.typ == 'mutfund-sell'){
       equitySell(acct, stocks, banks);
     }
 

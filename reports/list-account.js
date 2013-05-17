@@ -23,6 +23,11 @@ module.exports = function(opts) {
       if (SHOW_STOCK)
         console.log(ac.pad(stock.symbol, 5), 'Buy'.red, stock.quantity, stock.cost, ": $", ac.c(stock.cb))
     }
+
+  , onEquitySell : function(sell){
+      if (SHOW_STOCK)
+        console.log(ac.pad(sell.symbol, 5), 'Sell'.red, sell.quantity, sell.price, ": $", ac.c(sell.cb), "->", ac.c(sell.value))
+    }
     
   , onDividend : function(acct, banks, stocks){
     var s = stocks[acct.symbol]
