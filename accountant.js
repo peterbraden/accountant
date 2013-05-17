@@ -85,6 +85,29 @@ var equityBuy = function(buy, stocks, banks){
     })
 }
 
+var equitySell = function(sell, stocks, banks){
+    var s = stocks[sell.symbol]
+    if (!s)
+      throw "Selling equity that does not exist"
+
+    var amount;
+    if (sell.gross){
+      amount = sell.gross - sell.commission
+    } else { // Price
+      amount = (sell.quantity * sell.price) - sell.commission
+    }
+
+
+    s.quantity = s.quantity - sell.quantity
+
+
+    s.chunks.push({date: buy.date, quantity: -sell.quantity})
+
+    stocks[sell.symbol] = s
+    banks[sell.account].balance -= amount
+	  banks[sell.account].positions[sell.symbol] -= sell.quantity
+}
+
 var dividend = function(div, stocks, banks){
    var s = stocks[div.symbol]
 	   , bank = banks[div.account] || {}
@@ -144,7 +167,11 @@ exports.run = function(file){
     if (acct.typ== 'stock-buy' || acct.typ == 'etf-buy' || acct.typ == 'mutfund-buy'){
       equityBuy(acct, stocks, banks);
     }
-  
+
+    if (acct.typ== 'stock-sell' || acct.typ == 'etf-sell' || acct.typ == 'mutfund-sell'){
+      equitySell(acct, stocks, banks);
+    }
+
     if (acct.typ == 'dividend'){
        dividend(acct, stocks, banks)
     }
