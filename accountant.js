@@ -126,7 +126,7 @@ var equitySell = function(sell, stocks, banks){
 
     _.each(reports, function(r){
       if (r.onEquitySell) 
-        r.onEquitySell(sell);
+        r.onEquitySell(sell, banks, stocks);
     })
 }
 

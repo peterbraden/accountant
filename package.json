@@ -26,7 +26,8 @@
     "acct-stock": "./scripts/daily-stock.js",
     "acct-compound": "./scripts/compound.js",
     "acct-mix": "./scripts/mix.js",
-    "acct-io": "./scripts/monthly-balances.js"
+    "acct-io": "./scripts/monthly-balances.js",
+    "acct-perf": "./scripts/realized-performance.js"
   },
   "scripts": {
     "test": "node test/smoke.js"
