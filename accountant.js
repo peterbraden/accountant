@@ -24,7 +24,7 @@ exports.registerReport = function(report){
 }  
 
 
-var transaction = function(t, banks, stocks){
+var transaction = function(t, banks, stocks, invoices){
     banks[t.src] = banks[t.src] || {balance:0}
     banks[t.dest] = banks[t.dest] || {balance:0}
   
@@ -34,11 +34,56 @@ var transaction = function(t, banks, stocks){
     banks[t.src].currency = t.currency
     banks[t.dest].currency = t.currency
     
+    if (t.invoice){
+      resolveInvoice(t, banks, stocks, invoices)
+    }
+
     _.each(reports, function(r){
       if (r.onTransaction) 
         r.onTransaction(t, banks, stocks);
     })
 }  
+
+var invoice = function(t, banks, stocks, invoices){
+  if (!invoices[t.to]){
+    invoices[t.to] = {
+        outstanding : []
+      , paid : []
+    }
+  }
+
+  invoices[t.to].outstanding.push(t);
+
+  _.each(reports, function(r){
+    if (r.onInvoice) 
+      r.onInvoice(t, banks, stocks, invoices);
+  })
+}
+
+var resolveInvoice = function(transaction, banks, stocks, invoices){
+  var id = transaction.invoice
+  for (var to in invoices){
+    var outstanding = invoices[to].outstanding
+    for (var i in outstanding){
+      if (outstanding[i].id == id){
+        // Move the invoice to closed
+        var inv = outstanding[i];
+        invoices[to].paid.push(inv);
+        outstanding.splice(i,1);
+
+        _.each(reports, function(r){
+          if (r.onInvoiceClose){
+            r.onInvoiceClose(transaction, inv, invoices);
+          }
+        })
+
+        return;
+      }
+    }
+  }
+
+  throw "Outstanding invoice not found: " + id
+}
 
 var equityBuy = function(buy, stocks, banks){
     var s = stocks[buy.symbol] || {}
@@ -183,6 +228,7 @@ exports.run = function(file){
   var accts = JSON.parse(fs.readFileSync(file, 'utf8').replace(/\/\/.*\n/g, '')) //strip comments
     , stocks = {}
     , banks = {}
+    , invoices = {}
 
   for (var i=0; i<accts.length; i++){
     var acct = accts[i];
@@ -203,14 +249,18 @@ exports.run = function(file){
     }
   
     if (acct.typ == 'transaction'){
-      transaction(acct, banks, stocks)
+      transaction(acct, banks, stocks, invoices)
+    }  
+    
+    if (acct.typ == 'invoice'){
+      invoice(acct, banks, stocks, invoices)
     }  
   
   }
 
   _.each(reports, function(r){
     if (r.onComplete) 
-      r.onComplete(banks, stocks);
+      r.onComplete(banks, stocks, invoices);
   })
 
 }
