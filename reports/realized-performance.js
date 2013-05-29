@@ -7,8 +7,9 @@ module.exports = function(opts){
   return {
     onComplete: function(banks, stocks){
     }
-  , onEquitySell : function(sell, banks, stocks){
-      var age =  ac.stockMaxAge(stocks[sell.symbol])
+  , onEquitySell : function(sell, stock, banks, stocks){
+      var age = sell.age
+        //TODO: Dividend only of sold stock
 
       console.log(
           sell.date
@@ -19,13 +20,13 @@ module.exports = function(opts){
         , ac.$(sell.price)
         , ac.$(sell.cb)
         , "->".grey
-        , ac.$(sell.value)
+        , ac.$(sell.value + stock.dividend)
         , ":".grey
-        , ac.c(ac.r2(sell.value/sell.cb * 100), "", "%")
+        , ac.c(ac.r2((sell.value + stock.dividend)/sell.cb * 100 - 100), "", "%")
         , "over".grey
         , ((age > 360 ) ? (age + "").green : (age + "").yellow)
         , "yield :".grey
-        , ac.c(((sell.value - sell.cb )/ age * 30) / sell.cb)
+        , ac.c((((sell.value + stock.dividend) - sell.cb )/ age * 30))
         )
     }
  

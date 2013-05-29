@@ -143,6 +143,7 @@ var equitySell = function(sell, stocks, banks){
     }
 
     sell.value = amount
+    sell.age = exports.stockMaxAge(s); // TODO - work out avg age
 
     s.quantity = s.quantity - sell.quantity
 
@@ -166,12 +167,14 @@ var equitySell = function(sell, stocks, banks){
 
     s.cost_basis -= sell.cb
     stocks[sell.symbol] = s
-    banks[sell.account].balance -= amount
+    if (s.quantity == 0)
+      delete stocks[sell.symbol]
+    banks[sell.account].balance += amount
 	  banks[sell.account].positions[sell.symbol] -= sell.quantity
 
     _.each(reports, function(r){
       if (r.onEquitySell) 
-        r.onEquitySell(sell, banks, stocks);
+        r.onEquitySell(sell, s, banks, stocks);
     })
 }
 
@@ -311,6 +314,8 @@ exports.pad = function(v, len, ch){
 
 // Age of oldest stocks in days
 exports.stockMaxAge = function(stock){
+  if (!stock.chunks || stock.chunks.length == 0)
+    return 0
  return parseInt((new Date().getTime() - new Date(stock.chunks[0].date).getTime())/(1000*3600*24))
 }
 
