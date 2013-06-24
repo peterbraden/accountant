@@ -31,8 +31,9 @@ module.exports = function(opts){
       var no_outstanding = invoices[inv].outstanding.length
         , no_paid =invoices[inv].paid.length
 
+      if (no_outstanding == 0)
+        continue;
 
-      
       console.log("  ", inv
           , ("(" +  no_outstanding + "/"
               + (no_outstanding + no_paid) +")").yellow
