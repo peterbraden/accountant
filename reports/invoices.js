@@ -8,10 +8,11 @@ module.exports = function(opts){
   }
   , onComplete : function(banks, stocks, invoices){
     var t = new Table({
-        head : ["Client", "Paid", "Outstanding"]
+        head : ["Client", "Paid", "Outstanding", "Billed"]
       , style : {compact:true, head: ['cyan'], 'padding-left': 1}
     })
-
+ 
+    var all_paid=0, all_outstanding = 0;
     for (var inv in invoices){
       var tot_paid = 0, tot_outstanding = 0;
 
@@ -21,9 +22,12 @@ module.exports = function(opts){
       for (var i=0; i<invoices[inv].outstanding.length; i++){
         tot_outstanding += invoices[inv].outstanding[i].amount
       }
-
-      t.push([inv, ac.$(tot_paid), ac.$(-tot_outstanding)])
+      all_paid += tot_paid
+      all_outstanding += tot_outstanding
+      t.push([inv, ac.$(tot_paid), ac.$(-tot_outstanding), ac.$(tot_paid + tot_outstanding)])
     }
+    t.push([])
+    t.push(["Total:", ac.$(all_paid), ac.$(-all_outstanding), ac.$(all_paid + all_outstanding)])
     console.log(t.toString())
 
     console.log("=== Outstanding Invoices ===")
