@@ -29,14 +29,14 @@ module.exports = function(opts){
         , dollar_balance = v.balance
         , liquid = v.balance
         , unrealised_gain = 0
+        , positions = v.positions || {}
 
-      var s = _.filter(stocks, function(x){return x.brokerage == k});
-      if (s){
-        _.each(s, function(v, k){
-      	  dollar_balance += v.cost_basis
-          unrealised_gain += ac.stockGain(v);
-        })
-      }
+      _.each(stocks, function(v, k){
+        if (!positions[k]) return;
+        var _cb = (v.cost_basis / v.quantity) * positions[k]
+        dollar_balance += _cb
+        unrealised_gain += (ac.stockGain(v) / v.quantity) * positions[k];
+      })
 
       dollar_balance = dollar_balance * EXCHANGE_RATES[v.currency]
       liquid = liquid * EXCHANGE_RATES[v.currency]
