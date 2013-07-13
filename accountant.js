@@ -120,7 +120,6 @@ var equityBuy = function(buy, stocks, banks){
     banks[buy.account].trading = true
 	  stocks[buy.symbol].etf = (buy.typ =='etf-buy')
 	  stocks[buy.symbol].mutual_fund = (buy.typ =='mutfund-buy')
-	  stocks[buy.symbol].brokerage = buy.account // TODO!!! ASSUMES NO DUPE OF STOCK BETWEEN ACCTS 
 
     buy.cb = cb
     
