@@ -335,7 +335,7 @@ exports.loadPrices = function(stocks, cb){
       var finances = JSON.parse(body.slice(3))
 
        _.each(finances, function(v, k){
-         stocks[v.t].current = v.l_cur.replace('\$', '')
+         stocks[v.t].current = v.l_cur.replace('\$', '').replace(',', '')
          stocks[v.t].change = v.c
          stocks[v.t].change_percent = v.cp
        })
