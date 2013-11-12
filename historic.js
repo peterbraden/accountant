@@ -132,3 +132,54 @@ exports.priceAt = function(symbol, date, cb){
     cb(data[date] ? data[date].open : -1)
   })
 }
+
+
+/* YAHOO TODO
+
+var stocks
+try {
+  stocks = JSON.parse(fs.readFileSync('stock-historical.json', 'utf8'))
+} catch (e){
+  console.log("No stocks cache")
+  stocks = {}
+}
+
+var i = 0;
+var storeStockHistorical = function(s, start){
+  if (i >= 1) return;
+  i++;
+  if (stocks[s]){
+    console.log("Stock: ", s, " @ ", start, " : ", stocks[s][start])
+  } else {
+  
+  }
+  
+  var uri = "http://ichart.finance.yahoo.com/table.csv?"
+  uri += "s=" + s
+  uri += "&b=01"
+  uri += "&c=" + start.slice(0, 4) // year
+  uri += "&a=" + parseInt(start.slice(5, 7))-1
+  uri += "&f=" + new Date().getFullYear()
+  uri += "&d=" + new Date().getMonth()
+  uri += "&e=" + new Date().getDate()
+  uri += "&g=m&ignore=.csv"
+  console.log(uri)
+
+  
+  request.get({uri: uri}, function(err, res, body){
+    if (err) throw err
+    console.log(arguments)
+    var lines = body.split('\n')
+    _.each(lines, function(l){
+      var segs = l.split(',')// Date,Open,High,Low,Close,Volume,Adj Close
+        , date = 
+
+    })
+
+  
+  })
+  
+
+  fs.writeFileSync("stock-historical.json", JSON.stringify(stocks), 'utf8')
+}
+*/
