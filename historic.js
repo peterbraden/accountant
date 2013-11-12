@@ -10,10 +10,13 @@ var HIST_URL = "http://www.google.com/finance/historical?q={{ stock }}&output=cs
 
 
 
+var _c
 var getCache = function(){
+  if (_c) return _c;
   try{
     var f = fs.readFileSync(CACHE_PATH, 'utf8')
       , data = JSON.parse(f);
+    _c = data
     return data         
   } catch (e){
     console.log("no cache")
@@ -22,6 +25,7 @@ var getCache = function(){
 }
 
 var setCache = function(data){
+  _c = data
   var json = JSON.stringify(data, null, 1)
   fs.writeFileSync(CACHE_PATH, json, 'utf8')
 }
@@ -131,6 +135,16 @@ exports.priceAt = function(symbol, date, cb){
   exports.getData(symbol, function(data){
     cb(data[date] ? data[date].open : -1)
   })
+}
+
+exports.priceAtSync = function(symbol, date){
+  var c = getCache()
+  
+  if (c[symbol]){
+    return (c[symbol][date])
+  }
+
+  return undefined
 }
 
 
