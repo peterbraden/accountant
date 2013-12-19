@@ -190,7 +190,8 @@ var dividend = function(div, stocks, banks){
 
     div.net = net
 
-    s.dividend += net
+    if (s) // may have sold already...
+      s.dividend += net
     banks[div.account] = banks[div.account] || {}
     banks[div.account].balance += net
   
@@ -331,8 +332,12 @@ exports.loadPrices = function(stocks, cb){
   }
   request.get({uri:FINANCE_URL + _(stocks).keys().join(',')}, function(err, resp, body){
       if (!body) throw "Could not get data from API"
-      
-      var finances = JSON.parse(body.slice(3))
+
+      try {
+        var finances = JSON.parse(body.slice(3))
+      } catch (e){
+        console.log("Error parsing API Response:", body)
+      }
 
        _.each(finances, function(v, k){
          stocks[v.t].current = v.l_cur.replace('\$', '').replace(',', '')

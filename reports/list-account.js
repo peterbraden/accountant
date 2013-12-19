@@ -35,7 +35,8 @@ module.exports = function(opts) {
 		    , net = parseInt(positions[acct.symbol] * acct.amount * 100) / 100
         
       if (acct.gross){
-        acct.amount = parseInt(acct.gross/s.quantity * 100)/100
+        if (s)
+          acct.amount = parseInt(acct.gross/s.quantity * 100)/100
         net = acct.gross
       }
       if (SHOW_DIVIDENDS){
