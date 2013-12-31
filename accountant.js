@@ -23,6 +23,29 @@ exports.registerReport = function(report){
   return exports
 }  
 
+var _prev_date = ''
+var onEvent = function(typ, report, ev, banks, stocks){
+  if (report.onEvent){
+    report.onEvent(typ, ev, banks, stocks);
+  }
+  if (!ev)
+  console.log("!!", typ)
+  var d = ev.date
+  // On Day
+  if (report.onDay && d.slice(8, 10) != _prev_date.slice(8, 10)){
+    report.onDay(ev, banks, stocks)
+  }
+  // On Month
+  if (report.onMonth && d.slice(5, 7) != _prev_date.slice(5, 7)){
+    report.onMonth(ev, banks, stocks)
+  }
+  // On Year
+  if (report.onYear && d.slice(0, 4) != _prev_date.slice(0, 4)){
+    report.onYear(d.slice(0, 4), ev, banks, stocks)
+  }
+  _prev_date = d
+
+}
 
 var transaction = function(t, banks, stocks, invoices){
     banks[t.src] = banks[t.src] || {balance:0}
@@ -39,6 +62,7 @@ var transaction = function(t, banks, stocks, invoices){
     }
 
     _.each(reports, function(r){
+      onEvent('transaction', r, t, banks, stocks)
       if (r.onTransaction) 
         r.onTransaction(t, banks, stocks);
     })
@@ -55,6 +79,7 @@ var invoice = function(t, banks, stocks, invoices){
   invoices[t.to].outstanding.push(t);
 
   _.each(reports, function(r){
+    onEvent('invoice', r, t, banks, stocks, invoices)
     if (r.onInvoice) 
       r.onInvoice(t, banks, stocks, invoices);
   })
@@ -72,6 +97,7 @@ var resolveInvoice = function(transaction, banks, stocks, invoices){
         outstanding.splice(i,1);
 
         _.each(reports, function(r){
+          onEvent('invoice-close', r, transaction, banks, stocks)
           if (r.onInvoiceClose){
             r.onInvoiceClose(transaction, inv, invoices);
           }
@@ -124,6 +150,7 @@ var equityBuy = function(buy, stocks, banks){
     buy.cb = cb
     
     _.each(reports, function(r){
+      onEvent('equity-buy', r, buy, banks, stocks)
       if (r.onEquityBuy) 
         r.onEquityBuy(buy);
     })
@@ -172,6 +199,7 @@ var equitySell = function(sell, stocks, banks){
 	  banks[sell.account].positions[sell.symbol] -= sell.quantity
 
     _.each(reports, function(r){
+      onEvent('equity-sell', r, sell, banks, stocks)
       if (r.onEquitySell) 
         r.onEquitySell(sell, s, banks, stocks);
     })
@@ -198,6 +226,7 @@ var dividend = function(div, stocks, banks){
     banks[div.account].trading = true
   
     _.each(reports, function(r){
+      onEvent('dividend', r, div, banks, stocks)
       if (r.onDividend) 
         r.onDividend(div, banks, stocks);
     })
@@ -205,6 +234,7 @@ var dividend = function(div, stocks, banks){
 
 var statement = function(statement, banks){  
   _.each(reports, function(r){
+    onEvent('pre-statement', r, statement, banks)
     if (r.onPreStatement) 
       r.onPreStatement(statement, banks);
   })
@@ -217,6 +247,7 @@ var statement = function(statement, banks){
   banks[statement.acct].last_statement = statement.date
   
   _.each(reports, function(r){
+    onEvent('statement', r, statement, banks)
     if (r.onStatement) 
       r.onStatement(statement, banks);
   })
@@ -262,6 +293,7 @@ exports.run = function(file){
   }
 
   _.each(reports, function(r){
+    onEvent('complete', r, {date:'2100-01-01'}, banks, stocks)
     if (r.onComplete) 
       r.onComplete(banks, stocks, invoices);
   })

@@ -23,22 +23,20 @@ var newYear = function(){
 }
 
 var curr 
-  , _yr 
   , data = {}
 
-var checkYear = function(yr){
-  if (yr != _yr){
-    if (_yr)
-      data[_yr] = curr
-    _yr = yr
-    curr = newYear()
-  }
-}
 
 module.exports = function(opts){
   return {
-    onTransaction: function(t, banks, stocks){
-      checkYear(t.date.slice(0, 4))
+
+    onYear: function(year, t, banks, stocks){
+      if (curr)
+        data[curr.year] = curr
+      curr = newYear()
+      curr.year = year
+    }
+
+  , onTransaction: function(t, banks, stocks){
       if (banks[t.src].last_statement){
         if (!banks[t.dest].last_statement){
           curr.spend += t.amount
@@ -48,15 +46,12 @@ module.exports = function(opts){
       }
     }
   , onDividend: function(d){
-      checkYear(d.date.slice(0, 4))
       curr.div += d.net
   }
   , onEquitySell: function(sell, stock){
-      checkYear(sell.date.slice(0, 4))
       curr.capgains += sell.value + stock.dividend - sell.cb
   }
   , onComplete: function(banks, stocks){
-      checkYear('-')
       var t = new Table({
           head : _.map(COLS, function(v, k){return v.title})
         , style : {compact: true, 'padding-left':1, head: ['cyan']} 
