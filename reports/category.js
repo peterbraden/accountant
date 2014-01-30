@@ -33,7 +33,7 @@ module.exports = function(opts){
       if (banks[t.src].last_statement){
         if (!banks[t.dest].last_statement){
           currmonthData.outgoing += t.amount
-          var cat = t.category || '?'
+          var cat = t.category || t.dest
           if (!currmonthCategories[cat])
             currmonthCategories[cat] = 0
           currmonthCategories[cat] += t.amount

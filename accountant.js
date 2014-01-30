@@ -28,16 +28,14 @@ var onEvent = function(typ, report, ev, banks, stocks){
   if (report.onEvent){
     report.onEvent(typ, ev, banks, stocks);
   }
-  if (!ev)
-  console.log("!!", typ)
   var d = ev.date
   // On Day
   if (report.onDay && d.slice(8, 10) != _prev_date.slice(8, 10)){
-    report.onDay(ev, banks, stocks)
+    report.onDay(d, ev, banks, stocks)
   }
   // On Month
   if (report.onMonth && d.slice(5, 7) != _prev_date.slice(5, 7)){
-    report.onMonth(ev, banks, stocks)
+    report.onMonth(d.slice(0, 7), ev, banks, stocks)
   }
   // On Year
   if (report.onYear && d.slice(0, 4) != _prev_date.slice(0, 4)){

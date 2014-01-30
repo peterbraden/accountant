@@ -38,9 +38,9 @@ module.exports = function(opts){
         unrealised_gain += (ac.stockGain(v) / v.quantity) * positions[k];
       })
 
-      dollar_balance = dollar_balance * EXCHANGE_RATES[v.currency]
-      liquid = liquid * EXCHANGE_RATES[v.currency]
-      unrealised_gain = unrealised_gain * EXCHANGE_RATES[v.currency]
+      dollar_balance = dollar_balance * EXCHANGE_RATES[v.currency || 'USD']
+      liquid = liquid * EXCHANGE_RATES[v.currency || 'USD']
+      unrealised_gain = unrealised_gain * EXCHANGE_RATES[v.currency || 'USD']
 
       if (age > 60){
         k = k.red

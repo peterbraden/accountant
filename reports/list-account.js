@@ -54,9 +54,9 @@ module.exports = function(opts) {
   , onPreStatement : function(acct, banks){
      if (banks[acct.acct] ){
       if (Math.abs(banks[acct.acct].balance - acct.balance) > 0.01){
-        console.log((["Accounts for", (acct.acct + "").underline, "in"
+        process.stdout.write(["\n" + (["Accounts for", (acct.acct + "").underline, "in"
           , banks[acct.acct].last_statement, "to", acct.date
-          , "differ by", Math.round((banks[acct.acct].balance - acct.balance) * 10000)/10000]).join(' ').red, "(", ac.c(banks[acct.acct].balance), ", s:", ac.c(acct.balance), ")")
+          , "differ by", Math.round((banks[acct.acct].balance - acct.balance) * 10000)/10000]).join(' ').red, "(", ac.c(banks[acct.acct].balance), ", s:", ac.c(acct.balance), ")"].join('') , 'utf8')
        } else {
          if (EXPANDED)
            console.log("-- ", acct.acct, " OK:".green, acct.balance, " at ", acct.date)
