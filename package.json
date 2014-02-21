@@ -29,7 +29,8 @@
     "acct-io": "./scripts/monthly-balances.js",
     "acct-perf": "./scripts/realized-performance.js",
     "acct-invoice": "./scripts/invoice.js",
-    "acct-yr": "./scripts/year.js"
+    "acct-yr": "./scripts/year.js",
+    "acct-csv": "./scripts/csv.js"
   },
   "scripts": {
     "test": "node test/smoke.js"
