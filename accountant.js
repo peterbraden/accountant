@@ -371,6 +371,7 @@ exports.loadPrices = function(stocks, cb){
 
        _.each(finances, function(v, k){
          stocks[v.t].current = v.l_cur.replace('\$', '').replace(',', '')
+            .replace('CHF', '')// Hack!
          stocks[v.t].change = v.c
          stocks[v.t].change_percent = v.cp
        })
