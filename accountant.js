@@ -372,6 +372,10 @@ exports.loadPrices = function(stocks, cb){
        _.each(finances, function(v, k){
          stocks[v.t].current = v.l_cur.replace('\$', '').replace(',', '')
             .replace('CHF', '')// Hack!
+         if (isNaN(stocks[v.t].current)){
+          //console.log("NaN: ", stocks[v.t], v.l_cur, v)
+          stocks[v.t].current = 0
+         }
          stocks[v.t].change = v.c
          stocks[v.t].change_percent = v.cp
        })
