@@ -34,6 +34,7 @@ var _SETTINGS = {
     delimiter: ','
   , date: 'Date'
   , amount: 'Amount'
+  , symbol: 'Symbol'
   , memo: 'Description'
   , typ: function(record) {
       if (record.Action === 'Cash Dividend')
@@ -122,36 +123,43 @@ parser.on('readable', function(){
 
       parseField(out, 'date', record, 'date', mandatory('date'), dateTransform)
       parseField(out, 'typ', record, 'typ', function(){ return 'transaction' })
-      parseField(out, 'symbol', record, 'symbol', null, null)
 
-      if (SETTINGS.amount) {
-        var amount = parseField(out, 'amount', record, 'amount', null, amountTransform)
-        if (amount > 0) {
-          out.src = '?'
-          out.dest = BANK
-        } else {
-          out.src = BANK
-          out.dest = '?'
-          out.amount = -1 * out.amount
-        }
+      if (out.typ == 'dividend') {
+        parseField(out, 'symbol', record, 'symbol', mandatory('symbol'), null)
+        parseField(out, 'gross', record, 'amount', null, amountTransform)
       }
 
-      else {
-        if (record.Debit){
-          out.src = BANK
-          out.dest = '?'
-          out.currency = record['Ccy.']
-          out.amount = amt(record.Debit)
-        } else {
-          out.src = '?'
-          out.dest = BANK
-          out.currency = record['Ccy.']
-          out.amount = amt(record.Credit)
+      if (out.type == 'transaction') {
+        if (SETTINGS.amount) {
+          var amount = parseField(out, 'amount', record, 'amount', null, amountTransform)
+          if (amount > 0) {
+            out.src = '?'
+            out.dest = BANK
+          } else {
+            out.src = BANK
+            out.dest = '?'
+            out.amount = -1 * out.amount
+          }
+        }
+
+        else {
+          if (record.Debit){
+            out.src = BANK
+            out.dest = '?'
+            out.currency = record['Ccy.']
+            out.amount = amt(record.Debit)
+          } else {
+            out.src = '?'
+            out.dest = BANK
+            out.currency = record['Ccy.']
+            out.amount = amt(record.Credit)
+          }
         }
       }
       console.log(out, record)
 
       // memo
+      parseField(out, 'memo', record, 'memo', null, null)
 
       records.unshift(
         JSON.stringify(out)
@@ -170,7 +178,7 @@ parser.on('finish', function(){
   records.sort()
 
   records.forEach(function(x){
-    //console.log(',', x);
+    console.log(',', x);
   })
 })
 

@@ -53,6 +53,8 @@ module.exports = function(opts) {
   }
   
   , onPreStatement : function(acct, banks){
+     if (opts.account && opts.account != acct.acct) { return }
+
      if (banks[acct.acct] ){
       if (Math.abs(banks[acct.acct].balance - acct.balance) > 0.01){
         process.stdout.write(["\n" + (["Accounts for", (acct.acct + "").underline, "in"
