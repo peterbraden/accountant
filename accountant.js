@@ -252,6 +252,26 @@ var statement = function(statement, banks){
   
 }  
 
+var broker_transfer = function(t, banks, stocks, invoices){
+  var src = banks[t.src]
+    , dest = banks[t.dest]
+  
+  if (!src) throw new Error('Unknown src', t)
+  if (!dest) throw new Error('Unknown dest', t)
+  
+  if (src.positions[t.asset] < t.amount) throw new Error ('Insufficient assets')
+
+  dest.positions = dest.positions || {}
+  src.positions[t.asset] -= t.amount
+  dest.positions[t.asset] = dest.positions[t.asset] || 0
+  dest.positions[t.asset] += t.amount
+
+  _.each(reports, function(r){
+    if (r.onBrokerTransfer) 
+      r.onBrokerTransfer(t, banks);
+  })
+}
+
 
 
 exports.run = function(file){
@@ -288,6 +308,10 @@ exports.run = function(file){
       invoice(acct, banks, stocks, invoices)
     }  
   
+    if (acct.typ == 'broker-transfer') {
+      broker_transfer(acct, banks, stocks, invoices)
+    }
+
   }
 
   _.each(reports, function(r){
