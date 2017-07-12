@@ -17,7 +17,9 @@
     "request": "2.9.2",
     "mustache": "0.7.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "tape": "^4.7.0"
+  },
   "main": "./accountant.js",
   "bin": {
     "acct-holdings": "./scripts/holdings.js",

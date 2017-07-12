@@ -1,22 +1,10 @@
-/**
-===== Accountant =====
-
-
-
-*/
 var fs = require('fs')
   , _ = require('underscore')
   , request = require('request')
    
-
-try{
-  var colors = require('colors')
-} catch(e){}// Colors is a piece of crap
-
 var reports = []
 
 exports.historic = require('./historic')
-
 
 exports.registerReport = function(report){
   reports.push(report)
@@ -107,6 +95,25 @@ var resolveInvoice = function(transaction, banks, stocks, invoices){
   }
 
   throw "Outstanding invoice not found: " + id
+}
+
+var brokerageStatement = function(statement, stocks, banks) {
+  banks[statement.acct] = banks[statement.acct] || {}
+  banks[statement.acct].positions = banks[statement.acct].positions || {}
+
+  Object.keys(statement.holdings).forEach(function(symbol){
+    var holding = statement.holdings[symbol]
+	  banks[statement.account].positions[symbol] = holding.quantity 
+    stocks[symbol] = stocks[symbol] || {}
+    // Multiple banks may hold this stock
+    // TODO
+  })
+
+  _.each(reports, function(r){
+    onEvent('brokerage-statement', r, statement, banks, stocks)
+    if (r.onBrokerageStatement) 
+      r.onBrokerageStatement(statement);
+  })
 }
 
 var equityBuy = function(buy, stocks, banks){
@@ -255,12 +262,17 @@ var statement = function(statement, banks){
 
 
 exports.run = function(file){
-  file = file || './accounts.json'
-
-  var accts = JSON.parse(fs.readFileSync(file, 'utf8').replace(/\/\/.*\n/g, '')) //strip comments
+  var accts
     , stocks = {}
     , banks = {}
     , invoices = {}
+
+  file = file || './accounts.json'
+  if (typeof file == 'string') {
+    accts = JSON.parse(fs.readFileSync(file, 'utf8').replace(/\/\/.*\n/g, '')) //strip comments
+  } else {
+    accts = file
+  }
 
   for (var i=0; i<accts.length; i++){
     var acct = accts[i];
@@ -280,6 +292,10 @@ exports.run = function(file){
       statement(acct, banks)
     }
   
+    if (acct.typ == 'brokerage-statement'){
+      brokerageStatement(acct, stocks, banks)
+    }
+
     if (acct.typ == 'transaction'){
       transaction(acct, banks, stocks, invoices)
     }  

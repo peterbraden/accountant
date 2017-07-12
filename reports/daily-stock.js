@@ -10,7 +10,6 @@ var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
     , GBP : 1.5723 
   
   }
-  
 
 var COLS = {
     symbol : {title : "Sym", desc: "Symbol", ind : 0}
@@ -30,26 +29,17 @@ var COLS = {
 }
 		
 module.exports = function(opts){
-			
   return {
   onComplete: function(banks, stocks){
-  ac.loadPrices(stocks, function(st){
-    render(banks, st, opts)
-  })
+    ac.loadPrices(stocks, function(st){
+      render(banks, st, opts)
+    })
 
-
+    }
   }
 }
-}
-		
-
-
-
-
 
 var render = function(banks, stocks, opts){
-  
-  
   var c = function(v, pre, post){
     var val = '' + ac.r2(v)
       , str = (pre || '') + val + (post || '')
@@ -163,7 +153,7 @@ var render = function(banks, stocks, opts){
   var stripcolor = /\u001b\[\d+m/g
     , parse = function(a){return parseFloat(("" + a).replace(stripcolor,'')) || 0}
     , sum = function(a,b){return parse(a)+parse(b)}
-    , sumCol = function(col){return _.reduce(_.pluck(t, COLS[col].ind), sum)}
+    , sumCol = function(col){return _.reduce(_.pluck(t, COLS[col].ind), sum, 0)}
     , num_rows = t.length
     
     // Sort
@@ -192,25 +182,15 @@ var render = function(banks, stocks, opts){
   
   t.push([], _.map(COLS, function(v, k){return tots[k]}))
 
-  
-
   console.log(t.toString())
-  
-  
+
   // Trading Accounts
   if (opts.trad_acct){
     _.each(banks, function(v, k){
       if (!v.trading) return;
-      
-      
-      
       console.log(k, ":", v.currency, c(v.balance));
-      
     })  
   
   }  
-  
-  
-  
 }  
 
