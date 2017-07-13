@@ -26,7 +26,7 @@ module.exports = {
   }
 , onBrokerageStatement: function(statement, state){
     var banks = state.banks, stocks = state.stocks
-    var bank = updateOrCreateBank(banks[statement.acct])
+    var bank = updateOrCreateBank(banks[statement.account])
 
     Object.keys(statement.holdings).forEach(function(symbol){
       var holding = statement.holdings[symbol]
@@ -39,7 +39,7 @@ module.exports = {
   , onEquityBuy: function(buy, state){
       var banks = state.banks, stocks = state.stocks
       var s = updateOrCreateStock(stocks[buy.symbol])
-      var bank = updateOrCreateBank(state.banks[buy.acct])
+      var bank = updateOrCreateBank(state.banks[buy.account])
       var costbasis = ((buy.quantity * buy.cost) + buy.commission)
       if (buy.gross){
         costbasis = (buy.gross + buy.commission)
@@ -65,12 +65,12 @@ module.exports = {
       bank.trading = true
 
       state.stocks[buy.symbol] = s
-      state.banks[buy.acct] = bank
+      state.banks[buy.account] = bank
     },
 
   onEquitySell: function(sell, state){
     var banks = state.banks, stocks = state.stocks
-    var bank = state.banks[sell.acct] = updateOrCreateBank(state.banks[sell.acct])
+    var bank = state.banks[sell.account] = updateOrCreateBank(state.banks[sell.account])
     var s = stocks[sell.symbol]
     if (!s)
       throw "Selling equity that does not exist"

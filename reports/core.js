@@ -18,10 +18,10 @@ module.exports =  {
 
   onStatement: (statement, state) => { 
     var banks = state.banks
-    banks[statement.acct] = banks[statement.acct] || {}
+    banks[statement.account] = banks[statement.account] || {}
 
-    banks[statement.acct].currency = statement.currency
-    banks[statement.acct].balance = statement.balance
-    banks[statement.acct].last_statement = statement.date
+    banks[statement.account].currency = statement.currency
+    banks[statement.account].balance = statement.balance
+    banks[statement.account].last_statement = statement.date
   }
 }
