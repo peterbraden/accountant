@@ -56,26 +56,6 @@ var onEvent = function(typ, report, ev, banks, stocks){
   }
 }
 
-var transaction = function(t, state){
-  var banks = state.banks
-    , stocks = state.stocks
-
-    banks[t.src] = banks[t.src] || {balance:0}
-    banks[t.dest] = banks[t.dest] || {balance:0}
-  
-    banks[t.src].balance -= t.amount
-    banks[t.dest].balance += t.amount
-  
-    banks[t.src].currency = t.currency
-    banks[t.dest].currency = t.currency
-    
-    if (t.invoice){
-      resolveInvoice(t, banks, stocks, invoices)
-    }
-
-    triggerEvents(['onTransaction'], t, state)
-}  
-
 var invoice = function(t, banks, stocks, invoices){
   if (!invoices[t.to]){
     invoices[t.to] = {
@@ -119,29 +99,6 @@ var resolveInvoice = function(transaction, banks, stocks, invoices){
   throw "Outstanding invoice not found: " + id
 }
 
-var statement = function(statement, state){  
-  var banks = state.banks
-  _.each(reports, function(r){
-    onEvent('pre-statement', r, statement, banks)
-    if (r.onPreStatement) 
-      r.onPreStatement(statement, banks);
-  })
-
-
-  banks[statement.acct] = banks[statement.acct] || {}
-
-  banks[statement.acct].currency = statement.currency
-  banks[statement.acct].balance = statement.balance
-  banks[statement.acct].last_statement = statement.date
-  
-  _.each(reports, function(r){
-    onEvent('statement', r, statement, banks)
-    if (r.onStatement) 
-      r.onStatement(statement, banks);
-  })
-  
-}  
-
 exports.run = function(file){
   var state = {}
 
@@ -174,7 +131,7 @@ exports.run = function(file){
     }
   
     if (acct.typ == 'statement'){
-      statement(acct, state)
+      triggerEvents(['onStatement'], acct, state)
     }
   
     if (acct.typ == 'brokerage-statement'){
@@ -182,7 +139,7 @@ exports.run = function(file){
     }
 
     if (acct.typ == 'transaction'){
-      transaction(acct, state)
+      triggerEvents(['onTransaction'], acct, state)
     }  
     
     if (acct.typ == 'invoice'){

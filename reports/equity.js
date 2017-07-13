@@ -20,6 +20,8 @@ var updateOrCreateBank = function(b) {
 
 module.exports = {
   onStart: (ev, state) => {
+    if (!state.banks)
+      throw new Error('requires core report')
     state.stocks = {}
   }
 , onBrokerageStatement: function(statement, state){
