@@ -1,9 +1,6 @@
-module.exports = function(opts){
-  return {
-    onStart: (ev, state) => {
-      state.banks = {}
-      state.stocks = {}
-      state.invoices = {}
-    }  
-  }
+module.exports =  {
+  onStart: (ev, state) => {
+    state.banks = {}
+    state.invoices = {}
+  }  
 }

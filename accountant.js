@@ -8,8 +8,8 @@ var reports = []
 
 exports.reset = function(){
   reports = [
-    coreReport(),
-    equityReport()
+    coreReport,
+    equityReport
   ]
 }
 exports.reset()
