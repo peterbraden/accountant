@@ -1,12 +1,14 @@
 var fs = require('fs')
   , _ = require('underscore')
 
+var coreReport = require('./reports/core')
 var equityReport = require('./reports/equity')
 
 var reports = []
 
 exports.reset = function(){
   reports = [
+    coreReport(),
     equityReport()
   ]
 }
@@ -140,14 +142,8 @@ var statement = function(statement, state){
   
 }  
 
-
-
 exports.run = function(file){
-  var state = {
-    banks: {}
-  , stocks: {}
-  , invoices: {}
-  }
+  var state = {}
 
   var accts
 
@@ -158,7 +154,7 @@ exports.run = function(file){
     accts = file
   }
 
-  triggerEvents(['onStart'], state)
+  triggerEvents(['onStart'], {}, state)
 
   for (var i=0; i<accts.length; i++){
     var acct = accts[i];

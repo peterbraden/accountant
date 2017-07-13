@@ -19,10 +19,11 @@ var updateOrCreateBank = function(b) {
 }
 
 module.exports = function(opts) {
-  var stocks = {}
-
   return {
-    onBrokerageStatement: function(statement, state){
+    onStart: (ev, state) => {
+      state.stocks = {}
+    }
+  , onBrokerageStatement: function(statement, state){
       var banks = state.banks, stocks = state.stocks
 
       banks[statement.acct] = banks[statement.acct] || {}
@@ -36,42 +37,40 @@ module.exports = function(opts) {
         // TODO
       })
     }
+    , onEquityBuy: function(buy, state){
+        var banks = state.banks, stocks = state.stocks
+        var s = updateOrCreateStock(stocks[buy.symbol])
+        var bank = updateOrCreateBank(state.banks[buy.account])
+        var costbasis = ((buy.quantity * buy.cost) + buy.commission)
+        if (buy.gross){
+          costbasis = (buy.gross + buy.commission)
+          buy.cost = buy.gross / buy.quantity  
+        }
 
-  , onEquityBuy: function(buy, state){
-      state.stocks = stocks
+        buy.costbasis = costbasis
 
-      var s = updateOrCreateStock(stocks[buy.symbol])
-      var bank = updateOrCreateBank(state.banks[buy.account])
-      var costbasis = ((buy.quantity * buy.cost) + buy.commission)
-      if (buy.gross){
-        costbasis = (buy.gross + buy.commission)
-        buy.cost = buy.gross / buy.quantity  
-      }
+        s.costbasis += costbasis
+        s.quantity += buy.quantity
+        s.industry = s.industry || buy.industry
+        s.asset_class = s.asset_class || buy.asset_class
+        s.chunks.push(buy)
+        s.etf = (buy.typ =='etf-buy')
+        s.mutual_fund = (buy.typ =='mutfund-buy')
 
-      buy.costbasis = costbasis
+        bank.balance -= costbasis
 
-      s.costbasis += costbasis
-      s.quantity += buy.quantity
-      s.industry = s.industry || buy.industry
-      s.asset_class = s.asset_class || buy.asset_class
-      s.chunks.push(buy)
-      s.etf = (buy.typ =='etf-buy')
-      s.mutual_fund = (buy.typ =='mutfund-buy')
+        if (!bank.positions[buy.symbol]){
+          bank.positions[buy.symbol] = 0
+        }
+        bank.positions[buy.symbol] += buy.quantity 
+        bank.trading = true
 
-      bank.balance -= costbasis
-
-      if (!bank.positions[buy.symbol]){
-        bank.positions[buy.symbol] = 0
-      }
-      bank.positions[buy.symbol] += buy.quantity 
-      bank.trading = true
-
-      state.stocks[buy.symbol] = s
-      state.banks[buy.account] = bank
-    },
+        state.stocks[buy.symbol] = s
+        state.banks[buy.account] = bank
+      },
 
     onEquitySell: function(sell, state){
-      state.stocks = stocks
+      var banks = state.banks, stocks = state.stocks
       var s = stocks[sell.symbol]
       if (!s)
         throw "Selling equity that does not exist"
@@ -115,24 +114,25 @@ module.exports = function(opts) {
     }
 
   , onDividend: function(div, state){
-       var s = state.stocks[div.symbol]
-         , bank = banks[div.account] || {}
-         , net
+      var banks = state.banks, stocks = state.stocks
+      var s = state.stocks[div.symbol]
+        , bank = banks[div.account] || {}
+        , net
 
-        if (div.amount){
-          net = bank.positions[div.symbol] * div.amount
-        } else {
-          net = div.gross
-        }
+      if (div.amount){
+        net = bank.positions[div.symbol] * div.amount
+      } else {
+        net = div.gross
+      }
 
-        div.net = net
+      div.net = net
 
-        if (s) // may have sold already...
-          s.dividend += net
-        banks[div.account] = banks[div.account] || {}
-        banks[div.account].balance += net
-      
-        banks[div.account].trading = true
+      if (s) // may have sold already...
+        s.dividend += net
+      banks[div.account] = banks[div.account] || {}
+      banks[div.account].balance += net
+
+      banks[div.account].trading = true
     }  
   }
 }
