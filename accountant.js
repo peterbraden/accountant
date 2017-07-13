@@ -131,7 +131,7 @@ exports.run = function(file){
     }
   
     if (acct.typ == 'statement'){
-      triggerEvents(['onStatement'], acct, state)
+      triggerEvents(['onPreStatement', 'onStatement'], acct, state)
     }
   
     if (acct.typ == 'brokerage-statement'){
