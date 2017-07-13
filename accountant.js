@@ -13,6 +13,7 @@ exports.reset = function(){
 exports.reset()
 
 exports.historic = require('./historic')
+exports.utils = require('./utils')
 
 exports.registerReport = function(report){
   reports.push(report)

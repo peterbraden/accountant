@@ -24,10 +24,10 @@ module.exports = function(opts){
       }
       all_paid += tot_paid
       all_outstanding += tot_outstanding
-      t.push([inv, ac.$(tot_paid), ac.$(-tot_outstanding), ac.$(tot_paid + tot_outstanding)])
+      t.push([inv, ac.utils.$(tot_paid), ac.utils.$(-tot_outstanding), ac.utils.$(tot_paid + tot_outstanding)])
     }
     t.push([])
-    t.push(["Total:", ac.$(all_paid), ac.$(-all_outstanding), ac.$(all_paid + all_outstanding)])
+    t.push(["Total:", ac.utils.$(all_paid), ac.utils.$(-all_outstanding), ac.utils.$(all_paid + all_outstanding)])
     console.log(t.toString())
 
     console.log("=== Outstanding Invoices ===")
@@ -46,7 +46,7 @@ module.exports = function(opts){
         var outstanding = invoices[inv].outstanding[i]
           , age = parseInt((new Date() - new Date(outstanding.date))/1000/60/60/24)
         console.log("   -"
-          , ac.$(outstanding.amount)
+          , ac.utils.$(outstanding.amount)
           , "invoiced on"
           , outstanding.date
           , ("(" + age + " days ago)")[age > 7 ? 'red' : 'yellow']

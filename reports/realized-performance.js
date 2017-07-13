@@ -14,19 +14,19 @@ module.exports = function(opts){
       console.log(
           sell.date
         , "Sold"
-        , ac.pad(sell.symbol, 5).yellow
-        , ac.c(sell.quantity)
+        , ac.utils.pad(sell.symbol, 5).yellow
+        , ac.utils.c(sell.quantity)
         , "@".grey
-        , ac.$(sell.price)
-        , ac.$(sell.cb)
+        , ac.utils.$(sell.price)
+        , ac.utils.$(sell.cb)
         , "->".grey
-        , ac.$(sell.value + stock.dividend)
+        , ac.utils.$(sell.value + stock.dividend)
         , ":".grey
-        , ac.c(ac.r2((sell.value + stock.dividend)/sell.cb * 100 - 100), "", "%")
+        , ac.utils.c(ac.r2((sell.value + stock.dividend)/sell.cb * 100 - 100), "", "%")
         , "over".grey
         , ((age > 360 ) ? (age + "").green : (age + "").yellow)
         , "yield :".grey
-        , ac.c((((sell.value + stock.dividend) - sell.cb )/ age * 30))
+        , ac.utils.c((((sell.value + stock.dividend) - sell.cb )/ age * 30))
         )
     }
  
