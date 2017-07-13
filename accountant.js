@@ -1,6 +1,24 @@
 var fs = require('fs')
   , _ = require('underscore')
 
+var EVENTS = {
+  'transaction': ['onTransaction']
+, 'statement': ['onPreStatement', 'onStatement']
+, 'buy': ['onEquityBuy']
+, 'equity-buy': ['onEquityBuy']
+, 'stock-buy': ['onEquityBuy']
+, 'etf-buy': ['onEquityBuy']
+, 'mutfund-buy': ['onEquityBuy']
+, 'sell': ['onEquitySell']
+, 'equity-sell': ['onEquitySell']
+, 'stock-sell': ['onEquitySell']
+, 'etf-sell': ['onEquitySell']
+, 'mutfund-sell': ['onEquitySell']
+, 'brokerage-statement': ['onBrokerageStatement']
+, 'dividend': ['onDividend']
+, 'invoice': ['onInvoice']
+}
+
 var coreReport = require('./reports/core')
 var equityReport = require('./reports/equity')
 
@@ -56,66 +74,6 @@ var onEvent = function(typ, report, ev, banks, stocks){
   }
 }
 
-var invoice = function(t, banks, stocks, invoices){
-  if (!invoices[t.to]){
-    invoices[t.to] = {
-        outstanding : []
-      , paid : []
-    }
-  }
-
-  invoices[t.to].outstanding.push(t);
-
-  _.each(reports, function(r){
-    onEvent('invoice', r, t, banks, stocks, invoices)
-    if (r.onInvoice) 
-      r.onInvoice(t, banks, stocks, invoices);
-  })
-}
-
-var resolveInvoice = function(transaction, banks, stocks, invoices){
-  var id = transaction.invoice
-  for (var to in invoices){
-    var outstanding = invoices[to].outstanding
-    for (var i in outstanding){
-      if (outstanding[i].id == id){
-        // Move the invoice to closed
-        var inv = outstanding[i];
-        invoices[to].paid.push(inv);
-        outstanding.splice(i,1);
-
-        _.each(reports, function(r){
-          onEvent('invoice-close', r, transaction, banks, stocks)
-          if (r.onInvoiceClose){
-            r.onInvoiceClose(transaction, inv, invoices);
-          }
-        })
-
-        return;
-      }
-    }
-  }
-
-  throw "Outstanding invoice not found: " + id
-}
-
-var EVENTS = {
-  'transaction': ['onTransaction']
-, 'statement': ['onPreStatement', 'onStatement']
-, 'buy': ['onEquityBuy']
-, 'equity-buy': ['onEquityBuy']
-, 'stock-buy': ['onEquityBuy']
-, 'etf-buy': ['onEquityBuy']
-, 'mutfund-buy': ['onEquityBuy']
-, 'sell': ['onEquitySell']
-, 'equity-sell': ['onEquitySell']
-, 'stock-sell': ['onEquitySell']
-, 'etf-sell': ['onEquitySell']
-, 'mutfund-sell': ['onEquitySell']
-, 'brokerage-statement': ['onBrokerageStatement']
-, 'dividend': ['onDividend']
-, 'invoice': ['onInvoice']
-}
 
 exports.runFile = function(filename) {
   filename = filename || './accounts.json'

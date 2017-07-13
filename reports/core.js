@@ -24,6 +24,4 @@ module.exports =  {
     banks[statement.acct].balance = statement.balance
     banks[statement.acct].last_statement = statement.date
   }
-
-
 }
