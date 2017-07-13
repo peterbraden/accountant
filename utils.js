@@ -17,7 +17,7 @@ exports.$ = function(v, curr){
     , dol = parseInt(val)
     , cen = exports.pad(Math.round((v % 1) * 100), 2, '0')
     , dols = (dol + '').replace(/(\d)(?=(\d\d\d)+$)/, "$1,")
-    , str = (curr || "$") + dols + "." + Math.abs(cen)
+    , str = (curr ? (curr + ' ') : '$') + dols + "." + Math.abs(cen)
   str = (val>=0) ? str.green : str.red  
   return str
 }

@@ -3,8 +3,8 @@ var request = require('request')
   , Table = require('cli-table')
   , ac = require('../accountant') 
   , vals = []
-  , c = ac.c
-  , $$ = ac.$
+  , c = ac.utils.c
+  , $$ = ac.utils.$
 
 var EXCHANGE_RATES = {
       USD : 1 // To USD
@@ -15,8 +15,9 @@ var EXCHANGE_RATES = {
 module.exports = function(opts){
   return {
 
-  onComplete: function(banks, stocks){
-    ac.loadPrices(stocks, function(stocks){
+  onComplete: function(ev, state){
+    var banks = state.banks, stocks = state.stocks
+    ac.utils.loadPrices(stocks, function(stocks){
     var t = new Table({
         head : ["Account", "Value", "Value ($)", "Liquid", "Liquid ($)", "Unrealised",  "Unrealised ($)", "Total ($)", "% Net"]
       , style : {compact: true, 'padding-left':1, head: ['cyan']}
