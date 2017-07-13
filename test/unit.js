@@ -10,6 +10,7 @@ test('import', (t) => {
 })
 
 test('register empty report', (t) => {
+  acct.reset()
   acct.registerReport({})
   acct.run([])
   t.end()
@@ -17,6 +18,7 @@ test('register empty report', (t) => {
 
 test('basic transactions report', (t) => {
   var _transactions = 0
+  acct.reset()
 
   acct.registerReport({
     onTransaction: (transaction, state) => {
@@ -33,6 +35,7 @@ test('basic transactions report', (t) => {
 })
 
 test('basic statements', (t) => {
+  acct.reset()
   var _statements = 0
 
   acct.registerReport({
@@ -48,6 +51,7 @@ test('basic statements', (t) => {
 })
 
 test('stock buy', (t) => {
+  acct.reset()
   var buys = 0
   acct.registerReport({
     onEquityBuy: (buy, state) => {

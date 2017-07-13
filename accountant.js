@@ -3,9 +3,14 @@ var fs = require('fs')
 
 var equityReport = require('./reports/equity')
 
-var reports = [
-  equityReport()
-]
+var reports = []
+
+exports.reset = function(){
+  reports = [
+    equityReport()
+  ]
+}
+exports.reset()
 
 exports.historic = require('./historic')
 
@@ -19,7 +24,7 @@ var triggerEvents = function(events, obj, state) {
     onEvent(obj.typ, report, obj, state)
     _.each(events, function(e){
       if (report[e]){
-        report[e](obj, statee
+        report[e](obj, state)
       }
     })
   })
