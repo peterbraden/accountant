@@ -35,7 +35,7 @@ simply a list of transactions and statements about your accounts.
 ie:
 ```json
 [ 
-  {'date' : '2012-01-02', 'typ' : 'statement', 'acct' : 'mybank', 'balance' : 0, 'currency' : 'USD'}
+  {'date' : '2012-01-02', 'typ' : 'statement', 'account' : 'mybank', 'balance' : 0, 'currency' : 'USD'}
 , {'date' : '2012-01-03', 'typ' : 'transaction', 'src' : 'myjob',  'dest' : 'mybank', 'amount' : 1000.01, 'currency' : 'USD'}
 ]
 ```

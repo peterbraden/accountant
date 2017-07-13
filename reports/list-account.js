@@ -55,14 +55,14 @@ module.exports = function(opts) {
   }
   
   , onPreStatement : function(acct, banks){
-     if (banks[acct.acct] ){
-      if (Math.abs(banks[acct.acct].balance - acct.balance) > 0.01){
-        process.stdout.write(["\n" + (["Accounts for", (acct.acct + "").underline, "in"
-          , banks[acct.acct].last_statement, "to", acct.date
-          , "differ by", Math.round((banks[acct.acct].balance - acct.balance) * 10000)/10000]).join(' ').red, "(", utils.c(banks[acct.acct].balance), ", s:", utils.c(acct.balance), ")"].join('') , 'utf8')
+     if (banks[acct.account] ){
+      if (Math.abs(banks[acct.account].balance - acct.balance) > 0.01){
+        process.stdout.write(["\n" + (["Accounts for", (acct.account + "").underline, "in"
+          , banks[acct.account].last_statement, "to", acct.date
+          , "differ by", Math.round((banks[acct.account].balance - acct.balance) * 10000)/10000]).join(' ').red, "(", utils.c(banks[acct.account].balance), ", s:", utils.c(acct.balance), ")"].join('') , 'utf8')
        } else {
          if (EXPANDED)
-           console.log("-- ", acct.acct, " OK:".green, acct.balance, " at ", acct.date)
+           console.log("-- ", acct.account, " OK:".green, acct.balance, " at ", acct.date)
          else
            process.stdout.write('.')
  	    }
