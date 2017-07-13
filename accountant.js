@@ -196,6 +196,10 @@ var equitySell = function(sell, stocks, banks){
     banks[sell.account].balance += amount
 	  banks[sell.account].positions[sell.symbol] -= sell.quantity
 
+    if (banks[sell.account].positions[sell.symbol] == 0) {
+      delete banks[sell.account].positions[sell.symbol]
+    }
+
     _.each(reports, function(r){
       onEvent('equity-sell', r, sell, banks, stocks)
       if (r.onEquitySell) 
@@ -252,19 +256,22 @@ var statement = function(statement, banks){
   
 }  
 
-var broker_transfer = function(t, banks, stocks, invoices){
+var brokerTransfer = function(t, banks, stocks, invoices){
   var src = banks[t.src]
     , dest = banks[t.dest]
   
   if (!src) throw new Error('Unknown src', t)
   if (!dest) throw new Error('Unknown dest', t)
-  
-  if (src.positions[t.asset] < t.amount) throw new Error ('Insufficient assets')
+  if (src.positions[t.asset] < t.amount) throw new Error ('Insufficient assets: ' + t.asset)
 
   dest.positions = dest.positions || {}
   src.positions[t.asset] -= t.amount
   dest.positions[t.asset] = dest.positions[t.asset] || 0
   dest.positions[t.asset] += t.amount
+
+  if (!src.positions[t.asset]){
+    delete src.positions[t.asset]
+  }
 
   _.each(reports, function(r){
     if (r.onBrokerTransfer) 
@@ -309,7 +316,7 @@ exports.run = function(file){
     }  
   
     if (acct.typ == 'broker-transfer') {
-      broker_transfer(acct, banks, stocks, invoices)
+      brokerTransfer(acct, banks, stocks, invoices)
     }
 
   }

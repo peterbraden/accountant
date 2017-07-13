@@ -1,5 +1,6 @@
 var Table = require('cli-table')
   , colors = require('colors')
+
 module.exports = function(opts){
   return {
     onComplete: function(banks, stocks){

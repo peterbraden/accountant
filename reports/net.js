@@ -8,8 +8,8 @@ var request = require('request')
 
 var EXCHANGE_RATES = {
       USD : 1 // To USD
-    , GBP : 1.5723
-    , CHF : 1.12
+    , GBP : 1.28
+    , CHF : 1.00
 }
 
 module.exports = function(opts){
