@@ -26,9 +26,7 @@ module.exports = {
   }
 , onBrokerageStatement: function(statement, state){
     var banks = state.banks, stocks = state.stocks
-
-    banks[statement.acct] = banks[statement.acct] || {}
-    banks[statement.acct].positions = banks[statement.acct].positions || {}
+    var bank = updateOrCreateBank(banks[statement.acct])
 
     Object.keys(statement.holdings).forEach(function(symbol){
       var holding = statement.holdings[symbol]
@@ -41,7 +39,7 @@ module.exports = {
   , onEquityBuy: function(buy, state){
       var banks = state.banks, stocks = state.stocks
       var s = updateOrCreateStock(stocks[buy.symbol])
-      var bank = updateOrCreateBank(state.banks[buy.account])
+      var bank = updateOrCreateBank(state.banks[buy.acct])
       var costbasis = ((buy.quantity * buy.cost) + buy.commission)
       if (buy.gross){
         costbasis = (buy.gross + buy.commission)
@@ -67,11 +65,12 @@ module.exports = {
       bank.trading = true
 
       state.stocks[buy.symbol] = s
-      state.banks[buy.account] = bank
+      state.banks[buy.acct] = bank
     },
 
   onEquitySell: function(sell, state){
     var banks = state.banks, stocks = state.stocks
+    var bank = state.banks[sell.acct] = updateOrCreateBank(state.banks[sell.acct])
     var s = stocks[sell.symbol]
     if (!s)
       throw "Selling equity that does not exist"
@@ -110,15 +109,17 @@ module.exports = {
     stocks[sell.symbol] = s
     if (s.quantity == 0)
       delete stocks[sell.symbol]
-    state.banks[sell.account].balance += amount
-    state.banks[sell.account].positions[sell.symbol] -= sell.quantity
+    bank.balance += amount
+    bank.positions[sell.symbol] -= sell.quantity
   }
 
 , onDividend: function(div, state){
-    var banks = state.banks, stocks = state.stocks
-    var s = state.stocks[div.symbol]
-      , bank = banks[div.account] || {}
+    var banks = state.banks 
+      , stocks = state.stocks
+      , s = state.stocks[div.symbol]
       , net
+
+    var bank = state.banks[div.account] = updateOrCreateBank(state.banks[div.account])
 
     if (div.amount){
       net = bank.positions[div.symbol] * div.amount
@@ -132,7 +133,6 @@ module.exports = {
       s.dividend += net
     banks[div.account] = banks[div.account] || {}
     banks[div.account].balance += net
-
     banks[div.account].trading = true
   }  
 }
