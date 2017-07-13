@@ -25,14 +25,19 @@ module.exports = {
     state.stocks = {}
   }
 , onBrokerageStatement: function(statement, state){
-    var banks = state.banks, stocks = state.stocks
-    var bank = updateOrCreateBank(banks[statement.account])
+    var bank = state.banks[statement.account] = updateOrCreateBank(state.banks[statement.account])
 
     Object.keys(statement.holdings).forEach(function(symbol){
       var holding = statement.holdings[symbol]
-      banks[statement.account].positions[symbol] = holding.quantity 
-      stocks[symbol] = stocks[symbol] || {}
+      bank.positions[symbol] = holding.quantity 
+      var s = state.stocks[symbol] = updateOrCreateStock(state.stocks[symbol]) 
       // Multiple banks may hold this stock
+      s.quantity += holding.quantity
+      s.costbasis += holding.costbasis
+      var simulatedBuy = {}
+      simulatedBuy.date = statement.date
+      s.chunks.push(simulatedBuy)
+      
       // TODO
     })
   }
