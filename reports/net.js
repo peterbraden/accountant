@@ -34,7 +34,7 @@ module.exports = function(opts){
 
       _.each(stocks, function(v, k){
         if (!positions[k]) return;
-        var _cb = (v.cost_basis / v.quantity) * positions[k]
+        var _cb = (v.costbasis / v.quantity) * positions[k]
         balance += _cb
         unrealised_gain += (ac.stockGain(v) / v.quantity) * positions[k];
       })

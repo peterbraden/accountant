@@ -1,6 +1,5 @@
 var fs = require('fs')
   , _ = require('underscore')
-  , request = require('request')
 
 var equityReport = require('./reports/equity')
 

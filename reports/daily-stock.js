@@ -31,8 +31,10 @@ var COLS = {
 		
 module.exports = function(opts){
   return {
-  onComplete: function(banks, stocks){
-    ac.loadPrices(stocks, function(st){
+  onComplete: function(ev, state){
+
+    var banks = state.banks, stocks = state.stocks
+    utils.loadPrices(stocks, function(st){
       render(banks, st, opts)
     })
 
@@ -42,7 +44,7 @@ module.exports = function(opts){
 
 var render = function(banks, stocks, opts){
   var c = function(v, pre, post){
-    var val = '' + ac.r2(v)
+    var val = '' + utils.r2(v)
       , str = (pre || '') + val + (post || '')
 
     if (opts.color != false)
@@ -70,8 +72,8 @@ var render = function(banks, stocks, opts){
   })
  
   var MKT_RET = _.find(stocks, function(v,k){
-    return (k =='VTI')} )|| {quantity : 1, current : 0, dividend : 0, cost_basis: 0}
-  MKT_RET = (MKT_RET.quantity * MKT_RET.current + MKT_RET.dividend - MKT_RET.cost_basis)/MKT_RET.cost_basis * 100
+    return (k =='VTI')} )|| {quantity : 1, current : 0, dividend : 0, costbasis: 0}
+  MKT_RET = (MKT_RET.quantity * MKT_RET.current + MKT_RET.dividend - MKT_RET.costbasis)/MKT_RET.costbasis * 100
 
   var mktCol = function(val){
     if (opts.color!=false && val > 0 && val < MKT_RET){
@@ -83,8 +85,8 @@ var render = function(banks, stocks, opts){
   t.push.apply(t, _.map(stocks, function(v, k){
     
     var age = utils.stockMaxAge(v)
-      , gain = ac.stockGain(v)
-      , ret = (gain + v.dividend)/v.cost_basis
+      , gain = utils.stockGain(v)
+      , ret = (gain + v.dividend)/v.costbasis
       
       /*
       _.each(v.chunks, function(ch){
@@ -102,15 +104,15 @@ var render = function(banks, stocks, opts){
     , d_gain: cv(parseFloat(v.change) * v.quantity, '', '', (-0.02 * v.current * v.quantity))
     , num: c(v.quantity)
 	  , age: v.chunks && ((age + '')[(age < 365) ? 'yellow' : 'green']) || ''
-    , cb: c(v.cost_basis)
+    , cb: c(v.costbasis)
     , mkt: c(v.quantity * v.current)
     , div: c(v.dividend)
     , gain: c(gain)
-    , growth: c((v.quantity * v.current - v.cost_basis)/v.cost_basis * 100)
+    , growth: c((v.quantity * v.current - v.costbasis)/v.costbasis * 100)
     , ret: mktCol(ret * 100)
 	  }
     
-    vals.sec = c(((gain + v.dividend)/ age * 30) / v.cost_basis * 100)
+    vals.sec = c(((gain + v.dividend)/ age * 30) / v.costbasis * 100)
 
   
     return _.map(COLS, function(v, k){return vals[k]})

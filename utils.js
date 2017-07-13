@@ -1,3 +1,6 @@
+var request = require('request')
+  , _ = require('underscore')
+
 // === Utility Functions ===
 
 exports.c = function(v, pre, post){
@@ -48,7 +51,7 @@ exports.stockMaxAge = function(stock){
 
 // unrealised $ gain of stock
 exports.stockGain = function(stock){
- return stock.quantity * stock.current - stock.cost_basis
+ return stock.quantity * stock.current - stock.costbasis
 }
 
 

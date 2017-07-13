@@ -39,7 +39,7 @@ module.exports = function(opts){
       assets.push({
           symbol: "Cash".yellow
         , current: 1
-        , cost_basis: cash
+        , costbasis: cash
         , quantity: cash
       })
 
@@ -47,8 +47,8 @@ module.exports = function(opts){
         s.symbol = symbol  
         s.equity = true
         assets.push(s);
-        net_worth += s.cost_basis
-        net_equity += s.cost_basis
+        net_worth += s.costbasis
+        net_equity += s.costbasis
         total_worth += s.current * s.quantity
 
       })
@@ -59,10 +59,10 @@ module.exports = function(opts){
 
       _.each(assets, function(x){
         t.push([x.symbol
-          , ac.c(x.cost_basis)
-          //, x.equity ? ac.c(x.cost_basis/net_equity*100) : '-'
+          , ac.c(x.costbasis)
+          //, x.equity ? ac.c(x.costbasis/net_equity*100) : '-'
           , ac.c(x.current * x.quantity)
-          , ac.c(x.cost_basis/net_worth*100)
+          , ac.c(x.costbasis/net_worth*100)
           , ac.c(x.current*x.quantity/total_worth*100)
           ])
       })
