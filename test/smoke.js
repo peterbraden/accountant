@@ -1,7 +1,6 @@
 var acct = require('../accountant')
   , stock = require('../reports/daily-stock')
   , ls = require('../reports/list-account')
-  , balances = require('../reports/balances')
   , holdings = require('../reports/holdings')
   
   
@@ -14,7 +13,6 @@ acct.registerReport(ls({
   , showStock : true
   , expanded : true
 }))
-acct.registerReport(balances({}))
 acct.registerReport(holdings({}))
 
 acct.run(smokeopts[0])
