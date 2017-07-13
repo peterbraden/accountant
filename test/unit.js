@@ -50,17 +50,31 @@ test('basic statements', (t) => {
   t.end()
 })
 
-test('stock buy', (t) => {
+test('stock buy / sell', (t) => {
   acct.reset()
-  var buys = 0
+  var buys = 0, sells = 0
+  var complete = false
+
   acct.registerReport({
     onEquityBuy: (buy, state) => {
       buys ++
-    } 
+    },
+    onEquitySell: (sell, state) => {
+      sells ++
+    },
+    onComplete: (ev, state) => {
+      complete = true
+      t.equal(state.stocks.MCD.quantity, 10)
+      t.equal(state.stocks.VTI.quantity, 15)
+      t.equal(state.stocks.MCD.costbasis, 969.4)
+      //TODO t.equal(state.stocks.VTI.costbasis, 4 * (10 * 60 + 10) - (25 * 60))
+    }
   })
 
   acct.run(MOCK)
 
   t.equal(buys, 6)
+  t.equal(sells, 2)
+  t.equal(complete, true)
   t.end()
 })

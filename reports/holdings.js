@@ -14,7 +14,8 @@ var COLS = {
   
 module.exports = function(opts){
   return {
-    onComplete: function(banks, stocks){
+    onComplete: function(ev, state){
+      var banks = state.banks, stocks = state.stocks
       utils.loadPrices(stocks, function(stocks){
 
       var t = new Table({

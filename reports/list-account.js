@@ -22,12 +22,12 @@ module.exports = function(opts) {
   
     onEquityBuy : function(stock){
       if (SHOW_STOCK)
-        console.log(utils.pad(stock.symbol, 5), 'Buy'.red, stock.quantity, stock.cost, ": $", utils.c(stock.cb))
+        console.log(utils.pad(stock.symbol, 5), 'Buy'.red, stock.quantity, stock.cost, ": $", utils.c(stock.costbasis))
     }
 
   , onEquitySell : function(sell){
       if (SHOW_STOCK)
-        console.log(utils.pad(sell.symbol, 5), 'Sell'.red, sell.quantity, sell.price, ": $", utils.c(sell.cb), "->", utils.c(sell.value))
+        console.log(utils.pad(sell.symbol, 5), 'Sell'.red, sell.quantity, sell.price, ": $", utils.c(sell.costbasis), "->", utils.c(sell.value))
     }
     
   , onDividend : function(acct, state){
