@@ -28,7 +28,7 @@ test('basic transactions report', (t) => {
     }
   })
 
-  acct.run(MOCK)
+  acct.runFile(MOCK)
 
   t.equal(_transactions, 5)
   t.end()
@@ -44,7 +44,7 @@ test('basic statements', (t) => {
     }
   })
 
-  acct.run(MOCK)
+  acct.runFile(MOCK)
 
   t.equal(_statements, 3)
   t.end()
@@ -71,7 +71,7 @@ test('stock buy / sell', (t) => {
     }
   })
 
-  acct.run(MOCK)
+  acct.runFile(MOCK)
 
   t.equal(buys, 6)
   t.equal(sells, 2)

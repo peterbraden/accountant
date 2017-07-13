@@ -99,52 +99,40 @@ var resolveInvoice = function(transaction, banks, stocks, invoices){
   throw "Outstanding invoice not found: " + id
 }
 
-exports.run = function(file){
+var EVENTS = {
+  'transaction': ['onTransaction']
+, 'statement': ['onPreStatement', 'onStatement']
+, 'buy': ['onEquityBuy']
+, 'equity-buy': ['onEquityBuy']
+, 'stock-buy': ['onEquityBuy']
+, 'etf-buy': ['onEquityBuy']
+, 'mutfund-buy': ['onEquityBuy']
+, 'sell': ['onEquitySell']
+, 'equity-sell': ['onEquitySell']
+, 'stock-sell': ['onEquitySell']
+, 'etf-sell': ['onEquitySell']
+, 'mutfund-sell': ['onEquitySell']
+, 'brokerage-statement': ['onBrokerageStatement']
+, 'dividend': ['onDividend']
+, 'invoice': ['onInvoice']
+}
+
+exports.runFile = function(filename) {
+  filename = filename || './accounts.json'
+  var file = fs.readFileSync(filename, 'utf8')
+               .replace(/\/\/.*\n/g, '') //strip comments
+  return exports.run(JSON.parse(file))
+}
+
+exports.run = function(accts){
   var state = {}
-
-  var accts
-
-  file = file || './accounts.json'
-  if (typeof file == 'string') {
-    accts = JSON.parse(fs.readFileSync(file, 'utf8').replace(/\/\/.*\n/g, '')) //strip comments
-  } else {
-    accts = file
-  }
-
   triggerEvents(['onStart'], {}, state)
 
   for (var i=0; i<accts.length; i++){
     var acct = accts[i];
-    if (acct.typ== 'stock-buy' || acct.typ == 'etf-buy' || acct.typ == 'mutfund-buy'){
-      triggerEvents(['onEquityBuy'], acct, state)
+    if (EVENTS[acct.typ]){
+      triggerEvents(EVENTS[acct.typ], acct, state)
     }
-
-    if (acct.typ == 'sell' || 
-        acct.typ== 'stock-sell' || 
-        acct.typ == 'etf-sell' || 
-        acct.typ == 'mutfund-sell'){
-      triggerEvents(['onEquitySell'], acct, state)
-    }
-
-    if (acct.typ == 'dividend'){
-      triggerEvents(['onDividend'], acct, state)
-    }
-  
-    if (acct.typ == 'statement'){
-      triggerEvents(['onPreStatement', 'onStatement'], acct, state)
-    }
-  
-    if (acct.typ == 'brokerage-statement'){
-      triggerEvents(['onBrokerageStatement'], acct, state)
-    }
-
-    if (acct.typ == 'transaction'){
-      triggerEvents(['onTransaction'], acct, state)
-    }  
-    
-    if (acct.typ == 'invoice'){
-      invoice(acct, banks, stocks, invoices)
-    }  
   }
 
   triggerEvents(['onComplete'], {}, state)
