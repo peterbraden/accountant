@@ -1,5 +1,6 @@
 var ac = require('../accountant')
-  , colors = require('colors');
+  , colors = require('colors')
+  , utils = require('../utils')
 
 
 var lastDate = 0
@@ -21,18 +22,19 @@ module.exports = function(opts) {
   
     onEquityBuy : function(stock){
       if (SHOW_STOCK)
-        console.log(ac.pad(stock.symbol, 5), 'Buy'.red, stock.quantity, stock.cost, ": $", ac.c(stock.cb))
+        console.log(utils.pad(stock.symbol, 5), 'Buy'.red, stock.quantity, stock.cost, ": $", utils.c(stock.cb))
     }
 
   , onEquitySell : function(sell){
       if (SHOW_STOCK)
-        console.log(ac.pad(sell.symbol, 5), 'Sell'.red, sell.quantity, sell.price, ": $", ac.c(sell.cb), "->", ac.c(sell.value))
+        console.log(utils.pad(sell.symbol, 5), 'Sell'.red, sell.quantity, sell.price, ": $", utils.c(sell.cb), "->", utils.c(sell.value))
     }
     
-  , onDividend : function(acct, banks, stocks){
+  , onDividend : function(acct, state){
+    var banks = state.banks, stocks = state.stocks
     var s = stocks[acct.symbol]
-        , positions = banks[acct.account].positions
-		    , net = parseInt(positions[acct.symbol] * acct.amount * 100) / 100
+      , positions = banks[acct.account].positions
+		  , net = parseInt(positions[acct.symbol] * acct.amount * 100) / 100
         
       if (acct.gross){
         if (s)
@@ -44,11 +46,12 @@ module.exports = function(opts) {
       }    
   }
   
-  , onTransaction : function(acct, banks){
+  , onTransaction : function(acct, state){
+      var banks = state.banks, stocks = state.stocks
       checkDate(acct.date)
 
       if (SHOW_TRANSACTIONS)
-        console.log(acct.date, acct.src, '->', acct.dest, ' : ', acct.amount, "(", ac.c(banks[acct.src].balance), ")")
+        console.log(acct.date, acct.src, '->', acct.dest, ' : ', acct.amount, "(", utils.c(banks[acct.src].balance), ")")
   }
   
   , onPreStatement : function(acct, banks){
@@ -56,7 +59,7 @@ module.exports = function(opts) {
       if (Math.abs(banks[acct.acct].balance - acct.balance) > 0.01){
         process.stdout.write(["\n" + (["Accounts for", (acct.acct + "").underline, "in"
           , banks[acct.acct].last_statement, "to", acct.date
-          , "differ by", Math.round((banks[acct.acct].balance - acct.balance) * 10000)/10000]).join(' ').red, "(", ac.c(banks[acct.acct].balance), ", s:", ac.c(acct.balance), ")"].join('') , 'utf8')
+          , "differ by", Math.round((banks[acct.acct].balance - acct.balance) * 10000)/10000]).join(' ').red, "(", utils.c(banks[acct.acct].balance), ", s:", utils.c(acct.balance), ")"].join('') , 'utf8')
        } else {
          if (EXPANDED)
            console.log("-- ", acct.acct, " OK:".green, acct.balance, " at ", acct.date)

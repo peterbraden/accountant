@@ -25,6 +25,7 @@ test('basic transactions report', (t) => {
   })
 
   acct.run([
+    {typ: 'statement'},
     {typ: 'transaction', src: 'foo', dest: 'bar'},
     {typ: 'transaction', src: 'foo', dest: 'bar'}
   ])
@@ -34,5 +35,20 @@ test('basic transactions report', (t) => {
 })
 
 test('basic statements', (t) => {
+  var _statements = 0
+
+  acct.registerReport({
+    onStatement: (statement, state) => {
+      _statements ++
+    }
+  })
+
+  acct.run([
+    {typ: 'statement'},
+    {typ: 'transaction', src: 'foo', dest: 'bar'},
+    {typ: 'statement'}
+  ])
+
+  t.equal(_statements, 2)
   t.end()
 })

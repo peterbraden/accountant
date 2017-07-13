@@ -3,6 +3,7 @@ var request = require('request')
   , colors = require('colors')
   , Table = require('cli-table')
   , ac = require('../accountant')  
+  , utils = require('../utils')
 
 var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
   , EXCHANGE_RATES = {
@@ -81,7 +82,7 @@ var render = function(banks, stocks, opts){
 
   t.push.apply(t, _.map(stocks, function(v, k){
     
-    var age = ac.stockMaxAge(v)
+    var age = utils.stockMaxAge(v)
       , gain = ac.stockGain(v)
       , ret = (gain + v.dividend)/v.cost_basis
       
