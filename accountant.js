@@ -391,7 +391,8 @@ exports.loadPrices = function(stocks, cb){
   if (Object.keys(stocks).length == 0){
     return cb({})
   }
-  request.get({uri:FINANCE_URL + _(stocks).keys().join(',')}, function(err, resp, body){
+  var tickers = _(stocks).keys()
+  request.get({uri:FINANCE_URL + tickers.join(',')}, function(err, resp, body){
       if (!body) throw "Could not get data from API"
 
       try {
@@ -401,6 +402,10 @@ exports.loadPrices = function(stocks, cb){
       }
 
        _.each(finances, function(v, k){
+         if (!stocks[v.t]){
+          console.log('ERROR symbol change for ', v.t ,tickers[k]) 
+          return 
+        }
          stocks[v.t].current = v.l_cur.replace('\$', '').replace(',', '')
             .replace('CHF', '')// Hack!
          if (isNaN(stocks[v.t].current)){
