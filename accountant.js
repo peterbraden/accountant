@@ -12,14 +12,14 @@ exports.historic = require('./historic')
 exports.registerReport = function(report){
   reports.push(report)
   return exports
-}  
+}
 
 var triggerEvents = function(events, obj, state) {
   _.each(reports, function(report){
     onEvent(obj.typ, report, obj, state)
     _.each(events, function(e){
       if (report[e]){
-        report[e](obj, state)  
+        report[e](obj, statee
       }
     })
   })

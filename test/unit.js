@@ -1,6 +1,8 @@
 var test = require('tape')
 var acct
 
+var MOCK = __dirname + '/mocks.json'
+
 test('import', (t) => {
   acct = require('../accountant')
   t.ok(acct)
@@ -19,18 +21,14 @@ test('basic transactions report', (t) => {
   acct.registerReport({
     onTransaction: (transaction, state) => {
       _transactions ++
-      t.equal(transaction.src, 'foo')
-      t.equal(transaction.dest, 'bar')
+      t.ok(transaction.src)
+      t.ok(transaction.dest)
     }
   })
 
-  acct.run([
-    {typ: 'statement'},
-    {typ: 'transaction', src: 'foo', dest: 'bar'},
-    {typ: 'transaction', src: 'foo', dest: 'bar'}
-  ])
+  acct.run(MOCK)
 
-  t.equal(_transactions, 2)
+  t.equal(_transactions, 5)
   t.end()
 })
 
@@ -43,12 +41,22 @@ test('basic statements', (t) => {
     }
   })
 
-  acct.run([
-    {typ: 'statement'},
-    {typ: 'transaction', src: 'foo', dest: 'bar'},
-    {typ: 'statement'}
-  ])
+  acct.run(MOCK)
 
-  t.equal(_statements, 2)
+  t.equal(_statements, 3)
+  t.end()
+})
+
+test('stock buy', (t) => {
+  var buys = 0
+  acct.registerReport({
+    onEquityBuy: (buy, state) => {
+      buys ++
+    } 
+  })
+
+  acct.run(MOCK)
+
+  t.equal(buys, 6)
   t.end()
 })

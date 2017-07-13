@@ -1,11 +1,12 @@
 var ac = require('../accountant')  
+  , utils = require('../utils')
 
 var currmonth = null;
 var currmonthData = {}
 
 
 var onMonth = function(m){
-  console.log(m, ": ",  ac.$(currmonthData.income), ",", ac.$(-1 * currmonthData.outgoing))
+  console.log(m, ": ",  utils.$(currmonthData.income), ",", utils.$(-1 * currmonthData.outgoing))
 }
 
 var checkMonth = function(mon){
@@ -22,10 +23,12 @@ var checkMonth = function(mon){
 
 module.exports = function(opts){
   return {
-    onComplete: function(banks, stocks){
+    onComplete: function(state){
+      var banks = state.banks, stocks = state.stocks
       checkMonth("-");
     }
-    , onTransaction: function(t, banks, stocks){
+    , onTransaction: function(t, state){
+      var banks = state.banks, stocks = state.stocks
       checkMonth(t.date.slice(0, 7));
 
       if (banks[t.src].last_statement){

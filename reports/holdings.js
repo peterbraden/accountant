@@ -1,6 +1,7 @@
 var Table = require('cli-table')
   , _ = require('underscore')
   , ac = require('../accountant') 
+  , utils = require('../utils')
 
 var COLS = {
     asset : {title : "Asset", ind : 0}
@@ -14,7 +15,7 @@ var COLS = {
 module.exports = function(opts){
   return {
     onComplete: function(banks, stocks){
-      ac.loadPrices(stocks, function(stocks){
+      utils.loadPrices(stocks, function(stocks){
 
       var t = new Table({
           head : _.map(COLS, function(v, k){return v.title})
@@ -59,11 +60,11 @@ module.exports = function(opts){
 
       _.each(assets, function(x){
         t.push([x.symbol
-          , ac.c(x.costbasis)
-          //, x.equity ? ac.c(x.costbasis/net_equity*100) : '-'
-          , ac.c(x.current * x.quantity)
-          , ac.c(x.costbasis/net_worth*100)
-          , ac.c(x.current*x.quantity/total_worth*100)
+          , utils.c(x.costbasis)
+          //, x.equity ? utils.c(x.costbasis/net_equity*100) : '-'
+          , utils.c(x.current * x.quantity)
+          , utils.c(x.costbasis/net_worth*100)
+          , utils.c(x.current*x.quantity/total_worth*100)
           ])
       })
 
