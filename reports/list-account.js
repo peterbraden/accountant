@@ -32,6 +32,7 @@ module.exports = function(opts) {
     
   , onDividend : function(acct, state){
     var banks = state.banks, stocks = state.stocks
+    checkDate(acct.date)
     var s = stocks[acct.symbol]
       , positions = banks[acct.account].positions
 		  , net = parseInt(positions[acct.symbol] * acct.amount * 100) / 100

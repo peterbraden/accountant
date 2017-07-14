@@ -8,4 +8,5 @@ acct.registerReport(report({
   , showDividends : opts.dividends
   , showStock : opts.stock
   , expanded : opts.expanded
+  , account : opts.account
 })).runFile(opts[0]);  

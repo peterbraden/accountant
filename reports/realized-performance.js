@@ -17,7 +17,7 @@ module.exports = function(opts){
         , ac.utils.pad(sell.symbol, 5).yellow
         , ac.utils.c(sell.quantity)
         , "@".grey
-        , ac.utils.$(sell.price)
+        , ac.utils.$(sell.price|| (sell.gross / sell.quantity))
         , ac.utils.$(sell.cb)
         , "->".grey
         , ac.utils.$(sell.value + stock.dividend)

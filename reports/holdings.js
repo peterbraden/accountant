@@ -69,7 +69,15 @@ module.exports = function(opts){
           ])
       })
 
-      console.log(t.toString());
+      if (opts.format == 'csv') {
+        console.log('asset, cost basis, number')
+        assets.forEach(function (asset) {
+          console.log(asset.symbol, ', ', asset.cost_basis / asset.quantity, ', ', asset.quantity)
+        
+        })
+      } else {
+        console.log(t.toString());
+      }
 
     })
     }

@@ -90,9 +90,7 @@ exports.run = function(accts){
     var acct = accts[i];
     if (EVENTS[acct.typ]){
       triggerEvents(EVENTS[acct.typ], acct, state)
-    }
   }
-
   triggerEvents(['onComplete'], {}, state)
 }
 
