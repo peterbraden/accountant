@@ -17,6 +17,7 @@ module.exports = function(opts){
 
   onComplete: function(ev, state){
     var banks = state.banks, stocks = state.stocks
+
     ac.utils.loadPrices(stocks, function(stocks){
     var t = new Table({
         head : ["Account", "Value", "Value ($)", "Liquid", "Liquid ($)", "Unrealised",  "Unrealised ($)", "Total ($)", "% Net"]
@@ -37,7 +38,7 @@ module.exports = function(opts){
         if (!positions[k]) return;
         var _cb = (v.costbasis / v.quantity) * positions[k]
         balance += _cb
-        unrealised_gain += (ac.stockGain(v) / v.quantity) * positions[k];
+        unrealised_gain += (ac.utils.stockGain(v) / v.quantity) * positions[k];
       })
 
       var dollar_balance = balance * EXCHANGE_RATES[v.currency || 'USD']

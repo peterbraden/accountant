@@ -101,7 +101,8 @@ tool.
 accountant.registerReports([accountant.coreReports, myReport])
 ```
 - Move utility methods out of accountant.js
-
+- Ticker changes?
+- Stock split
 
 
 #### Report

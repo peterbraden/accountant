@@ -172,7 +172,7 @@ var render = function(banks, stocks, opts){
       , chg: ""
       , chg_p: cv((sumCol('chg_p') / num_rows), '', '%')  //tot change %
       , d_gain: c(sumCol('d_gain'))
-      , num: ""
+      , num: c(sumCol('num'))
    	  , age: ""
       , cb: c(sumCol('cb'))
       , mkt: c(sumCol('mkt'))
