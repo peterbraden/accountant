@@ -1,100 +1,7 @@
-var request = require('request')
-  , _ = require('underscore')
-  , Table = require('cli-table')
+var  _ = require('underscore')
   , ac = require('../accountant') 
-  , vals = []
-  , c = ac.utils.c
-  , $$ = ac.utils.$
-
-
-var EXCHANGE_RATES = {
-      USD : 1 // To USD
-    , GBP : 1.28
-    , CHF : 1.04
-}
-
-var convertToUSD = function(amount){
-  if (amount === undefined) { return 0 }
-  return amount.value * EXCHANGE_RATES[amount.currency || 'USD']
-}
-
-var formatCell = function(format, cell){
-  if (cell === undefined) {
-    return '-' 
-  }
-  if (format == 'currency'){
-    return $$(cell.value, cell.currency)
-  }
-  if (format == 'percent'){
-    return (cell * 100).toFixed(2)
-  }
-  return cell
-}
-
-var sum = (x, y) => x + y
-
-var sumValues = function(format, values){
-  if (format == 'currency') {
-    var val = { value: 0, currency:'USD' }
-    val.value = values.map(convertToUSD).reduce(sum, 0)
-    return val
-  }
-}
-
-var sumProperties = function(){
-  var properties = Array.from(arguments)
-  return function(col, row) {
-    return sumValues(col.format, properties.map( (p) => row[p])) 
-  }
-}
-
-var colTotal = function(col, data){
-  var values = []
-  data.forEach( (x) => {
-    values.push(x[col.property])
-  })
-  return formatCell(col.format, sumValues(col.format, values))
-}
-
-var createTable = function(cols, data){
-  var showTotal = false
-
-  var t = new Table({
-    head: cols.map( (x) => x.title ),
-    style : {compact: true, 'padding-left':1, head: ['cyan']}
-  })
-
-  data.forEach( (row) => {
-    var out = []
-    cols.forEach( (col) => {
-      if (col.total) {
-        showTotal = true
-      }
-      if (col.value) {
-        row[col.property] = col.value(col, row)
-      }
-      var data = row[col.property]
-      var formatted = formatCell(col.format, data)
-      out.push(formatted)
-    })
-    t.push(out)
-  })
-
-  if (showTotal) {
-    t.push([])
-    var totals = ['Total']
-    cols.slice(1).forEach( (col, i) => {
-      if (col.total) {
-        totals.push(colTotal(col, data))
-      } else {
-        totals.push('')
-      }
-    })
-
-    t.push(totals)
-  }
-  return t
-}
+  , table = require('../lib/table')
+  , convertToUSD = require('../lib/exchange').convertToUSD
 
 
 module.exports = function(opts){
@@ -148,14 +55,14 @@ module.exports = function(opts){
         }
       }
 
-      console.log(createTable(
+      console.log(table.createTable(
         [
         {title: "Account", property: 'account'}
       , {title: "Value", property: 'balance', format: 'currency', total: true}
       , {title: "Illiquid", property: 'illiquid', format: 'currency', total: true}
       , {title: "Liquid", property: 'liquid', format: 'currency', total: true}
       , {title: "Unrealised", property: 'unrealised', format: 'currency', total: true}
-      , {title: "Total", property: 'total', value: sumProperties('illiquid', 'liquid', 'unrealised'), format: 'currency', total: true}
+      , {title: "Total", property: 'total', value: table.sumProperties('illiquid', 'liquid', 'unrealised'), format: 'currency', total: true}
       , {title: "% Net", property: 'proportionNet', format: 'percent', value: grandTotal(tot_tot)}
       ], data).toString())
     })
