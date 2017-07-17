@@ -13,7 +13,7 @@ module.exports = function(opts){
   return {
    
     onComplete: function(banks, stocks){
-      ac.loadPrices(stocks, function(stocks){
+      ac.utils.loadPrices(stocks, function(stocks){
         var t = new Table({
             head : _.map(COLS, function(v, k){return v.title})
           , style : {compact: true, 'padding-left':1, head: ['cyan']} 
@@ -70,8 +70,8 @@ module.exports = function(opts){
 
       _.each(assets, function(x){
         t.push([x.cls
-          , ac.c(x.value)
-          , ac.c(x.value / total_worth*100)
+          , ac.utils.c(x.value)
+          , ac.utils.c(x.value / total_worth*100)
           ])
       })
 

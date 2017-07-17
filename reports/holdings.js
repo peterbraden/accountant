@@ -1,28 +1,23 @@
-var Table = require('cli-table')
+var table = require('../lib/table')
   , _ = require('underscore')
   , ac = require('../accountant') 
   , utils = require('../utils')
 
-var COLS = {
-    asset : {title : "Asset", ind : 0}
-  , cbval : {title : "CB Val", ind : 1}
-  , val : {title: "Curr Val", ind: 2}
+var COLS = [
+  {title : "Asset", property: 'asset'}
+, {title : "CB Val", property: 'costbasis'}
+, {title: "Curr Val", property: 'value'}
   //, cbprop: {title : "CB % Equity", ind: 2}
-  , cbpropnet: {title : "CB % Net", ind: 3}
-  , valpropnet: {title : "Val % Net", ind: 4}
-}  
+, {title : "CB % Net", property: 'costbasisPerNet'}
+, {title : "Val % Net", property: 'valuePerNet'}
+] 
   
 module.exports = function(opts){
   return {
     onComplete: function(ev, state){
+      var data = []
       var banks = state.banks, stocks = state.stocks
       utils.loadPrices(stocks, function(stocks){
-
-      var t = new Table({
-          head : _.map(COLS, function(v, k){return v.title})
-        , style : {compact: true, 'padding-left':1, head: ['cyan']} 
-      })
-
 
       var assets = []
         , net_worth = 0
@@ -60,13 +55,14 @@ module.exports = function(opts){
       })
 
       _.each(assets, function(x){
-        t.push([x.symbol
-          , utils.c(x.costbasis)
-          //, x.equity ? utils.c(x.costbasis/net_equity*100) : '-'
-          , utils.c(x.current * x.quantity)
-          , utils.c(x.costbasis/net_worth*100)
-          , utils.c(x.current*x.quantity/total_worth*100)
-          ])
+        data.push({
+          asset: x.symbol
+        , costbasis: utils.c(x.costbasis)
+        , equity: x.equity ? utils.c(x.costbasis/net_equity*100) : '-'
+        , value: utils.c(x.current * x.quantity)
+        , costbasisPerNet: utils.c(x.costbasis/net_worth*100)
+        , valuePerNet: utils.c(x.current*x.quantity/total_worth*100)
+        })
       })
 
       if (opts.format == 'csv') {
@@ -76,7 +72,7 @@ module.exports = function(opts){
         
         })
       } else {
-        console.log(t.toString());
+        console.log(table.createTable(COLS, data).toString())
       }
 
     })
