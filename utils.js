@@ -3,6 +3,7 @@ var request = require('request')
 
 // === Utility Functions ===
 
+// Color a value
 exports.c = function(v, pre, post){
   var val = '' + parseInt(v*100)/100
     , str = (pre || '') + val + (post || '')
@@ -12,6 +13,8 @@ exports.c = function(v, pre, post){
   return str
 }  
 
+
+// Render a value in currency
 exports.$ = function(v, curr){
   var val = parseInt(v*100)/100
     , dol = parseInt(val)

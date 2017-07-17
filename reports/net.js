@@ -6,72 +6,159 @@ var request = require('request')
   , c = ac.utils.c
   , $$ = ac.utils.$
 
+
 var EXCHANGE_RATES = {
       USD : 1 // To USD
     , GBP : 1.28
     , CHF : 1.04
 }
 
+var convertToUSD = function(amount){
+  if (amount === undefined) { return 0 }
+  return amount.value * EXCHANGE_RATES[amount.currency || 'USD']
+}
+
+var formatCell = function(format, cell){
+  if (cell === undefined) {
+    return '-' 
+  }
+  if (format == 'currency'){
+    return $$(cell.value, cell.currency)
+  }
+  if (format == 'percent'){
+    return (cell * 100).toFixed(2)
+  }
+  return cell
+}
+
+var sum = (x, y) => x + y
+
+var sumValues = function(format, values){
+  if (format == 'currency') {
+    var val = { value: 0, currency:'USD' }
+    val.value = values.map(convertToUSD).reduce(sum, 0)
+    return val
+  }
+}
+
+var sumProperties = function(){
+  var properties = Array.from(arguments)
+  return function(col, row) {
+    return sumValues(col.format, properties.map( (p) => row[p])) 
+  }
+}
+
+var colTotal = function(col, data){
+  var values = []
+  data.forEach( (x) => {
+    values.push(x[col.property])
+  })
+  return formatCell(col.format, sumValues(col.format, values))
+}
+
+var createTable = function(cols, data){
+  var showTotal = false
+
+  var t = new Table({
+    head: cols.map( (x) => x.title ),
+    style : {compact: true, 'padding-left':1, head: ['cyan']}
+  })
+
+  data.forEach( (row) => {
+    var out = []
+    cols.forEach( (col) => {
+      if (col.total) {
+        showTotal = true
+      }
+      if (col.value) {
+        row[col.property] = col.value(col, row)
+      }
+      var data = row[col.property]
+      var formatted = formatCell(col.format, data)
+      out.push(formatted)
+    })
+    t.push(out)
+  })
+
+  if (showTotal) {
+    t.push([])
+    var totals = ['Total']
+    cols.slice(1).forEach( (col, i) => {
+      if (col.total) {
+        totals.push(colTotal(col, data))
+      } else {
+        totals.push('')
+      }
+    })
+
+    t.push(totals)
+  }
+  return t
+}
+
+
 module.exports = function(opts){
   return {
 
   onComplete: function(ev, state){
-    var banks = state.banks, stocks = state.stocks
+    var banks = state.banks
+      , stocks = state.stocks
+      , data = []
+      , tot_tot = 0
 
     ac.utils.loadPrices(stocks, function(stocks){
-    var t = new Table({
-        head : ["Account", "Value", "Value ($)", "Liquid", "Liquid ($)", "Unrealised",  "Unrealised ($)", "Total ($)", "% Net"]
-      , style : {compact: true, 'padding-left':1, head: ['cyan']}
-    })
+      _.each(banks, function(v, k){
 
-    _.each(banks, function(v, k){
-      if (!v.last_statement)
-        return;
+        var row = {
+          account: k
+        , balance: { value: v.balance, currency: v.currency }
+        , liquid: { value: v.balance, currency: v.currency }
+        , unrealised: { value: 0, currency: v.currency }
+        , illiquid: {value: 0, currency: v.currency }
+        }
 
-      var age = parseInt((new Date().getTime() - new Date(v.last_statement).getTime())/(1000*3600*24))
-        , balance = v.balance
-        , liquid = v.balance
-        , unrealised_gain = 0
-        , positions = v.positions || {}
+        if (!v.last_statement)
+          return;
 
-      _.each(stocks, function(v, k){
-        if (!positions[k]) return;
-        var _cb = (v.costbasis / v.quantity) * positions[k]
-        balance += _cb
-        unrealised_gain += (ac.utils.stockGain(v) / v.quantity) * positions[k];
+        var age = parseInt((new Date().getTime() - new Date(v.last_statement).getTime())/(1000*3600*24))
+          , positions = v.positions || {}
+
+        _.each(stocks, function(v, k){
+          if (!positions[k]) return;
+          row.balance.value += (v.costbasis / v.quantity) * positions[k]
+          row.illiquid.value += (v.costbasis / v.quantity) * positions[k]
+          row.unrealised.value += (ac.utils.stockGain(v) / v.quantity) * positions[k];
+        })
+
+        if (age > 60){
+          row.account = row.account.red
+        } else if (age > 30){
+          row.account = row.account.yellow
+        }
+        if (!row.balance.value && ! row.unrealised.value)
+          return false;
+
+        tot_tot += convertToUSD(row.unrealised) + convertToUSD(row.liquid) + convertToUSD(row.illiquid)
+        data.push(row)
       })
 
-      var dollar_balance = balance * EXCHANGE_RATES[v.currency || 'USD']
-      var dollar_liquid = liquid * EXCHANGE_RATES[v.currency || 'USD']
-      var dollar_unrealised_gain = unrealised_gain * EXCHANGE_RATES[v.currency || 'USD']
-
-      if (age > 60){
-        k = k.red
-      } else if (age > 30){
-        k = k.yellow
+      var grandTotal = (tot) => {
+        return (col, row) => {
+          return row.total.value / tot
+        }
       }
-      if (!v.balance && !unrealised_gain)
-        return false;
 
-      vals.push([k, $$(balance, v.currency), dollar_balance, $$(liquid, v.currency), dollar_liquid, $$(unrealised_gain, v.currency), dollar_unrealised_gain])
+      console.log(createTable(
+        [
+        {title: "Account", property: 'account'}
+      , {title: "Value", property: 'balance', format: 'currency', total: true}
+      , {title: "Illiquid", property: 'illiquid', format: 'currency', total: true}
+      , {title: "Liquid", property: 'liquid', format: 'currency', total: true}
+      , {title: "Unrealised", property: 'unrealised', format: 'currency', total: true}
+      , {title: "Total", property: 'total', value: sumProperties('illiquid', 'liquid', 'unrealised'), format: 'currency', total: true}
+      , {title: "% Net", property: 'proportionNet', format: 'percent', value: grandTotal(tot_tot)}
+      ], data).toString())
     })
-
-
-    var tot_val = _.reduce(_.pluck(vals, 2), function(x, y){return x+y}, 0)
-      , tot_liq= _.reduce(_.pluck(vals, 4), function(x, y){return x+y}, 0)
-      , tot_ur = _.reduce(_.pluck(vals, 6), function(x, y){return x+y}, 0)
-      , tot_tot = tot_val + tot_ur
-
-    _.each(vals, function(v){
-      t.push([v[0], v[1], $$(v[2]), v[3], $$(v[4]), v[5], $$(v[6]), $$(v[2] + v[6]), c((v[2] + v[6]) / tot_tot*100)])
-    })
-    t.push([]);
-    t.push(['Total', '', $$(tot_val), '',  $$(tot_liq), '', $$(tot_ur), $$(tot_tot), '']);
-
-    console.log(t.toString())
-
-
-  })
   }
 }
 }

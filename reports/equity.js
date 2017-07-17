@@ -40,6 +40,7 @@ module.exports = {
       
       // TODO
     })
+    state.banks[statement.account] = bank
   }
   , onEquityBuy: function(buy, state){
       var banks = state.banks, stocks = state.stocks
