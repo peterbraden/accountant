@@ -12,23 +12,16 @@ acct.registerReport(
       var data = []
 
       _.each(state.years, function(x, yr){
-          data.push({
-            year: yr
-          , spend: { value: -1 * x.spend }
-          , income: { value: x.income }
-          , capgains: { value: x.capgains }
-          , dividends: { value:  x.div }
-          , net: { value:  x.income + x.div + x.capgains - x.spend }
-          })
+          data.push(x)
       })
 
       var t = table.createTable([
         { title: "Year", property: 'year' }
-      , { title: "Expenditure", property: 'spend', format: 'currency' }
-      , { title: "Income", property: 'income', format: 'currency' }
-      , { title: "Rlsd CapGn", property: 'capgains', format: 'currency' }
-      , { title: "Dividends", property: 'dividends', format: 'currency' }
-      , { title: "Total", property: 'net', format: 'currency' }
+      , { title: "Expenditure", property: 'expenditure', format: 'multicurrency' }
+      , { title: "Income", property: 'income', format: 'multicurrency' }
+      , { title: "Rlsd CapGn", property: 'capgains', format: 'multicurrency' }
+      , { title: "Dividends", property: 'dividends', format: 'multicurrency' }
+      , { title: "Total", property: 'net', format: 'multicurrency' }
       ], data)
 
       console.log(t.toString())
