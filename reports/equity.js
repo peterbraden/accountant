@@ -26,6 +26,7 @@ module.exports = {
   }
 , onBrokerageStatement: function(statement, state){
     var bank = state.banks[statement.account] = updateOrCreateBank(state.banks[statement.account])
+    bank.last_statement = statement.date
 
     Object.keys(statement.holdings).forEach(function(symbol){
       var holding = statement.holdings[symbol]

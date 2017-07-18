@@ -51,26 +51,24 @@ var triggerEvents = function(events, obj, state) {
   })
 }
 
-var _prev_date = ''
-var onEvent = function(typ, report, ev, banks, stocks){
+var onEvent = function(typ, report, ev, state){
   if (report.onEvent){
-    report.onEvent(typ, ev, banks, stocks);
+    report.onEvent(typ, ev, state);
   }
   if (ev.date) {
     var d = ev.date
     // On Day
-    if (report.onDay && d.slice(8, 10) != _prev_date.slice(8, 10)){
-      report.onDay(d, ev, banks, stocks)
+    if (report.onDay && d.slice(8, 10) != state.prev_date.slice(8, 10)){
+      report.onDay(d, ev, state)
     }
     // On Month
-    if (report.onMonth && d.slice(5, 7) != _prev_date.slice(5, 7)){
-      report.onMonth(d.slice(0, 7), ev, banks, stocks)
+    if (report.onMonth && d.slice(5, 7) != state.prev_date.slice(5, 7)){
+      report.onMonth(d.slice(0, 7), ev, state)
     }
     // On Year
-    if (report.onYear && d.slice(0, 4) != _prev_date.slice(0, 4)){
-      report.onYear(d.slice(0, 4), ev, banks, stocks)
+    if (report.onYear && d.slice(0, 4) != state.prev_date.slice(0, 4)){
+      report.onYear(d.slice(0, 4), ev, state)
     }
-    _prev_date = d
   }
 }
 
@@ -83,13 +81,16 @@ exports.runFile = function(filename) {
 }
 
 exports.run = function(accts){
-  var state = {}
+  var state = { prev_date: '' }
   triggerEvents(['onStart'], {}, state)
 
   for (var i=0; i<accts.length; i++){
     var acct = accts[i];
     if (EVENTS[acct.typ]){
       triggerEvents(EVENTS[acct.typ], acct, state)
+    }
+    if (accts[i].date){
+      state.prev_date = accts[i].date    
     }
   }
   triggerEvents(['onComplete'], {}, state)

@@ -70,6 +70,18 @@ account file is traversed.
 #### Generic Events:
 `onEvent`
 
+#### Core Report
+```
+state.banks[ID].currency
+state.banks[ID].balance
+state.banks[ID].last_statement
+```
+
+#### Equity Report
+```
+state.banks[ID].positions[TICKER] = quantity
+state.stocks
+```
 
 #### Validation
 There is a validation report that checks that transactions match statements.
@@ -77,6 +89,16 @@ There is a validation report that checks that transactions match statements.
 
 ### Scripts
 A script is a CLI script that configures and runs a report and outputs the result
+```sh
+acct-ls # Validate accounts file
+acct-net # Net worth and balances
+acct-stock # Daily / Overall equity performance
+acct-yearly # Yearly income, expenditure
+acct-mix # Asset classes breakdown
+acct-holdings # Assets held
+
+acct-runway # Burn rate and runway
+```
 
 
 # FAQ

@@ -94,3 +94,10 @@ test('stock buy / sell / dividends', (t) => {
 })
 
 
+test('example file', (t) => {
+  acct.reset()
+  acct.registerReport([require('../reports/list-account')({})])
+  acct.runFile('./example-accounts.json')
+  t.end()
+})
+

@@ -11,8 +11,6 @@ var COLS = {
 , tot: {title: "Total"}
 }
 
-
-
 var newYear = function(){
   return {
     income: 0
@@ -29,16 +27,16 @@ var curr
 module.exports = function(opts){
   return {
 
-    onYear: function(year, t, banks, stocks){
+    onYear: function(year, state){
       if (curr)
         data[curr.year] = curr
       curr = newYear()
       curr.year = year
     }
 
-  , onTransaction: function(t, banks, stocks){
-      if (banks[t.src].last_statement){
-        if (!banks[t.dest].last_statement){
+  , onTransaction: function(t, state){
+      if (state.banks[t.src].last_statement){
+        if (!state.banks[t.dest].last_statement){
           curr.spend += t.amount
         }
       } else {
@@ -51,7 +49,11 @@ module.exports = function(opts){
   , onEquitySell: function(sell, stock){
       curr.capgains += sell.value + stock.dividend - sell.cb
   }
-  , onComplete: function(banks, stocks){
+  , onComplete: function(state){
+      if (!curr){
+        throw new Error('No current year - have not encountered any dates')
+      }
+      data[curr.year] = curr
       var t = new Table({
           head : _.map(COLS, function(v, k){return v.title})
         , style : {compact: true, 'padding-left':1, head: ['cyan']} 
@@ -59,11 +61,11 @@ module.exports = function(opts){
       _.each(data, function(x, yr){
         t.push([
             yr
-          , ac.$(-1*x.spend)
-          , ac.$(x.income)
-          , ac.$(x.capgains)
-          , ac.$(x.div)
-          , ac.$(x.income + x.div + x.capgains - x.spend)
+          , ac.utils.$(-1*x.spend)
+          , ac.utils.$(x.income)
+          , ac.utils.$(x.capgains)
+          , ac.utils.$(x.div)
+          , ac.utils.$(x.income + x.div + x.capgains - x.spend)
           ])
       })
       console.log(t.toString())

@@ -3,4 +3,4 @@ var acct = require('../accountant')
   , report = require('../reports/yearly')
   , opts = require('nomnom').parse()
 
-acct.registerReport(report(opts)).run(opts[0]);
+acct.registerReport(report(opts)).runFile(opts[0]);

@@ -15,7 +15,6 @@ module.exports = function(opts){
 
     ac.utils.loadPrices(stocks, function(stocks){
       _.each(banks, function(v, k){
-
         var row = {
           account: k
         , balance: { value: v.balance, currency: v.currency }
@@ -42,7 +41,7 @@ module.exports = function(opts){
         } else if (age > 30){
           row.account = row.account.yellow
         }
-        if (!row.balance.value && ! row.unrealised.value)
+        if (!row.balance.value && !row.unrealised.value && !positions)
           return false;
 
         tot_tot += convertToUSD(row.unrealised) + convertToUSD(row.liquid) + convertToUSD(row.illiquid)
