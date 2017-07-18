@@ -33,7 +33,6 @@
     "acct-invoice": "./scripts/invoice.js",
     "acct-yearly": "./scripts/year.js",
     "acct-csv": "./scripts/csv.js",
-    "acct-broker": "./scripts/brokerages.js",
     "acct-parse": "./scripts/parse.js"
   },
   "scripts": {
