@@ -3,13 +3,6 @@ var ac = require('../accountant')
   , utils = require('../utils')
 
 
-var lastDate = 0
-var checkDate = function(d){
-  if (d < lastDate){
-    console.log("Out of order date:".red, d);
-  }
-  lastDate = d
-}
 
 
 module.exports = function(opts) {
@@ -32,7 +25,6 @@ module.exports = function(opts) {
     
   , onDividend : function(acct, state){
     var banks = state.banks, stocks = state.stocks
-    checkDate(acct.date)
     var s = stocks[acct.symbol]
       , positions = banks[acct.account].positions
 		  , net = parseInt(positions[acct.symbol] * acct.amount * 100) / 100
@@ -49,8 +41,6 @@ module.exports = function(opts) {
   
   , onTransaction : function(acct, state){
       var banks = state.banks, stocks = state.stocks
-      checkDate(acct.date)
-
       if (SHOW_TRANSACTIONS)
         console.log(acct.date, acct.src, '->', acct.dest, ' : ', acct.amount, "(", utils.c(banks[acct.src].balance), ")")
   }

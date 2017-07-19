@@ -14,7 +14,7 @@ var EVENTS = {
 , 'stock-sell': ['onEquitySell']
 , 'etf-sell': ['onEquitySell']
 , 'mutfund-sell': ['onEquitySell']
-, 'brokerage-statement': ['onBrokerageStatement']
+, 'brokerage-statement': ['onStatement', 'onBrokerageStatement']
 , 'dividend': ['onDividend']
 , 'invoice': ['onInvoice']
 }
