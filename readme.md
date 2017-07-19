@@ -5,18 +5,37 @@
 
 _Accountant_ is a set of utilities and scripts that I've developed to allow
  me to do accounts from the command line. In some way it's similar to 
-(Ledger)[http://ledger-cli.org/3.0/doc/ledger3.html], although it's a lot simpler.
+ [Ledger](http://ledger-cli.org/3.0/doc/ledger3.html), although it's a lot simpler.
 
 ## Builtin Commands
-#### `acct-ls`
-Validates the transactions against the statements
 
 #### `acct-net`
 See net worth, totals, liquid and unrealised gains.
 
+```
+┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━┓
+┃ Account      ┃ Value       ┃ Illiquid    ┃ Liquid      ┃ Unrealised  ┃ Total        ┃ % Net┃
+┣━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━┫
+┃ mybank       ┃ USD 5,586.55┃ USD 2,638.50┃ USD 2,948.50┃ USD 1,205.95┃ USD 6,792.50 ┃ 63.88┃
+┃ myforeignbank┃ GBP 3,000.0 ┃ GBP 0.0     ┃ GBP 3,000.0 ┃ GBP 0.0     ┃ USD 3,840.0  ┃ 36.12┃
+┣━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━┫
+┃ Total        ┃ USD 9,426.55┃ USD 2,638.50┃ USD 6,788.50┃ USD 1,205.95┃ USD 10,632.50┃      ┃
+┗━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━┛
+```
+
 #### `acct-stock`
 Information on equities and funds in the portfolio
-
+```
+┏━━━━━━━┳━━━━━━━━┳━━━┳━━━━┳━━━━┳━━━━━━━┳━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━┳━━━━━━━━━┳━━━━━━━┳━━━━━━━━┳━━━━━━━━┓
+┃ Sym   ┃  Price ┃ Δ ┃ Δ% ┃ $Δ ┃     # ┃ >age ┃ Cst Bas. ┃ Mkt Value ┃  Div. ┃    Gain ┃  30d% ┃ Growth ┃ Return ┃
+┣━━━━━━━╋━━━━━━━━╋━━━╋━━━━╋━━━━╋━━━━━━━╋━━━━━━╋━━━━━━━━━━╋━━━━━━━━━━━╋━━━━━━━╋━━━━━━━━━╋━━━━━━━╋━━━━━━━━╋━━━━━━━━┫
+┃ MCD   ┃ 153.96 ┃ 0 ┃ 0% ┃  0 ┃ 10.00 ┃ 1963 ┃   969.39 ┃   1539.60 ┃     0 ┃  570.20 ┃  0.89 ┃  58.81 ┃  58.81 ┃
+┃ VTI   ┃ 126.31 ┃ 0 ┃ 0% ┃  0 ┃ 15.00 ┃ 1963 ┃  1240.00 ┃   1894.65 ┃ 12.34 ┃  654.65 ┃  0.82 ┃  52.79 ┃  53.79 ┃
+┃ BND   ┃  81.95 ┃ 0 ┃ 0% ┃  0 ┃  5.00 ┃ 1963 ┃   428.65 ┃    409.75 ┃     0 ┃  -18.90 ┃ -0.60 ┃  -4.40 ┃  -4.40 ┃
+┣━━━━━━━╋━━━━━━━━╋━━━╋━━━━╋━━━━╋━━━━━━━╋━━━━━━╋━━━━━━━━━━╋━━━━━━━━━━━╋━━━━━━━╋━━━━━━━━━╋━━━━━━━╋━━━━━━━━╋━━━━━━━━┫
+┃ Total ┃        ┃   ┃ 0% ┃  0 ┃ 30.00 ┃      ┃  2638.30 ┃   3844.00 ┃ 12.33 ┃ 1205.94 ┃  0.36 ┃ 45.71% ┃ 46.18% ┃
+┗━━━━━━━┻━━━━━━━━┻━━━┻━━━━┻━━━━┻━━━━━━━┻━━━━━━┻━━━━━━━━━━┻━━━━━━━━━━━┻━━━━━━━┻━━━━━━━━━┻━━━━━━━┻━━━━━━━━┻━━━━━━━━┛
+```
 
 ### Principles
 - Data is maintained in a text(json) file.
@@ -35,8 +54,8 @@ simply a list of transactions and statements about your accounts.
 ie:
 ```json
 [ 
-  {'date' : '2012-01-02', 'typ' : 'statement', 'account' : 'mybank', 'balance' : 0, 'currency' : 'USD'}
-, {'date' : '2012-01-03', 'typ' : 'transaction', 'src' : 'myjob',  'dest' : 'mybank', 'amount' : 1000.01, 'currency' : 'USD'}
+  {"date" : '2012-01-02', "typ" : "statement", "account" : "mybank", "balance" : 0, "currency" : "USD"}
+, {"date" : '2012-01-03', "typ" : "transaction", "src" : "myjob",  "dest" : "mybank", "amount" : 1000.01, "currency" : "USD"}
 ]
 ```
 
@@ -85,20 +104,6 @@ state.stocks
 
 #### Validation
 There is a validation report that checks that transactions match statements.
-
-
-### Scripts
-A script is a CLI script that configures and runs a report and outputs the result
-```sh
-acct-ls # Validate accounts file
-acct-net # Net worth and balances
-acct-stock # Daily / Overall equity performance
-acct-yearly # Yearly income, expenditure
-acct-mix # Asset classes breakdown
-acct-holdings # Assets held
-
-acct-runway # Burn rate and runway
-```
 
 
 # FAQ

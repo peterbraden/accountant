@@ -25,7 +25,7 @@
 , {"date" : "2013-05-17", "typ" : "etf-sell", "symbol" : "BND", "quantity" : 5, "price" : 89.73, "commission" : 10, "account" : "mybank"}
 , {"date" : "2013-05-17", "typ" : "sell", "symbol" : "VTI", "quantity" : 25, "price" : 70, "commission" : 10, "account" : "mybank"}
 , {"date" : "2013-05-17", "typ": "dividend", "symbol": "VTI", "gross": 12.35, "currency": "USD", "status": "paid", "account": "mybank"}
-, {"date" : "2013-05-18", "typ": "brokerage-statement",
+, {"date" : "2013-05-18", "typ": "brokerage-statement", "account": "mybank",
     "holdings": {}
   }
 
