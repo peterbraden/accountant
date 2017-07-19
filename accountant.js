@@ -21,13 +21,15 @@ var EVENTS = {
 
 var coreReport = require('./reports/core')
 var equityReport = require('./reports/equity')
+var validateReport = require('./reports/validate')
 
 var reports = []
 
 exports.reset = function(){
   reports = [
     coreReport,
-    equityReport
+    equityReport,
+    validateReport
   ]
 }
 exports.reset()
@@ -43,7 +45,10 @@ exports.registerReport = function(report){
 var triggerEvents = function(events, obj, state) {
   _.each(reports, function(report){
     onEvent(obj.typ, report, obj, state)
-    _.each(events, function(e){
+  })
+
+  _.each(events, function(e){
+    _.each(reports, function(report){
       if (report[e]){
         report[e](obj, state)
       }
