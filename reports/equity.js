@@ -6,7 +6,7 @@ var updateOrCreateStock = function(s){
   s.dividend = s.dividend || 0
   s.costbasis =  s.costbasis || 0
   s.industry = s.industry || '?'
-  s.asset_class = s.asset_class || '?'
+  s.asset_class = s.asset_class // || 'Unclassed'
   s.chunks = s.chunks || []
   return s
 }
@@ -34,6 +34,7 @@ module.exports = {
       // Multiple banks may hold this stock
       s.quantity += holding.quantity
       s.costbasis += holding.costbasis
+			s.asset_class = holding.asset_class || s.asset_class
       var simulatedBuy = {}
       simulatedBuy.date = statement.date
       s.chunks.push(simulatedBuy)

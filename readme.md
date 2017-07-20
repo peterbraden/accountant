@@ -54,10 +54,12 @@ simply a list of transactions and statements about your accounts.
 ie:
 ```json
 [ 
-  {"date" : '2012-01-02', "typ" : "statement", "account" : "mybank", "balance" : 0, "currency" : "USD"}
-, {"date" : '2012-01-03', "typ" : "transaction", "src" : "myjob",  "dest" : "mybank", "amount" : 1000.01, "currency" : "USD"}
+  {"date" : "2012-01-02", "typ" : "statement", "account" : "mybank", "balance" : 0, "currency" : "USD"}
+, {"date" : "2012-01-03", "typ" : "transaction", "src" : "myjob",  "dest" : "mybank", "amount" : 1000.01, "currency" : "USD"}
 ]
 ```
+
+See: [examples.json](./examples.json)
 
 
 ## Transaction Types:
@@ -71,16 +73,14 @@ ie:
 - `dividend`
 - `invoice`
   - Events: `onInvoice`
-
-## Ideas:
-- `recurring-transaction`
 - `brokerage-statement`
 
 ## Architecture:
 
 ### Runner
 The runner iterates through the objects in the accounts file and triggers known
-events in the reports. It also maintains some state, such as bank balances etc.
+events in the reports. A global state is passed to all reports, allowing balances
+etc. to be maintained.
 
 ### Reports
 A report is a series of event handlers that are triggered in order as the
@@ -120,16 +120,6 @@ The goal of the file format is to be easily read by a script, thus it should be
 easy to write a script to turn it into whatever format you need for another
 tool.
 
-
-## Goal
-
-- Convert all state logic into reports
-```
-accountant.registerReports([accountant.coreReports, myReport])
-```
-- Move utility methods out of accountant.js
-- Ticker changes?
-- Stock split
 
 
 #### Report

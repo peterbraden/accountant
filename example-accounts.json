@@ -22,6 +22,7 @@
 , {"date" : "2012-03-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
 , {"date" : "2012-03-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
 , {"date" : "2012-04-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
+, {"date" : "2012-04-04", "typ" : "mutfund-buy", "symbol" : "VTSAX", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
 , {"date" : "2013-05-17", "typ" : "etf-sell", "symbol" : "BND", "quantity" : 5, "price" : 89.73, "commission" : 10, "account" : "mybank"}
 , {"date" : "2013-05-17", "typ" : "sell", "symbol" : "VTI", "quantity" : 25, "price" : 70, "commission" : 10, "account" : "mybank"}
 , {"date" : "2013-05-17", "typ": "dividend", "symbol": "VTI", "gross": 12.35, "currency": "USD", "status": "paid", "account": "mybank"}

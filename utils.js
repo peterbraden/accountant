@@ -5,10 +5,9 @@ var request = require('request')
 
 // Color a value
 exports.c = function(v, pre, post){
-  var val = '' + parseInt(v*100)/100
-    , str = (pre || '') + val + (post || '')
+  var str = (pre || '') + v + (post || '')
   
-  str = (val>=0) ? str.green : str.red  
+  str = (parseFloat(v)>=0) ? str.green : str.red  
   
   return str
 }  
