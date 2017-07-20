@@ -15,15 +15,13 @@ acct.registerReport({
 
       var assets = []
         , asset_classes = {}
-        , cash = 0
-        , total_worth = 0
+        , cash = []
 
       // === Cash ===
       _.each(banks, function(b, k){
         if (!b.balance || !b.last_statement) return;
 
-        cash += b.balance
-        total_worth += b.balance
+        cash.push({value: b.balance, currency: b.currency})
       })
 
       assets.push({
@@ -34,18 +32,10 @@ acct.registerReport({
       // === Equities ===
       _.each(stocks, function(s, symbol){
         var value =  s.current * s.quantity
-        total_worth += value
-
-        if (s.asset_class){
-          var x = asset_classes[s.asset_class] || 0
-          asset_classes[s.asset_class] = x + value
-        } else {
-          var x = asset_classes["Unclassed"] || 0
-          asset_classes["Unclassed"] = x + value
-        }
-
+        var k = s.asset_class || "Unclassed"
+        asset_classes[k] = asset_classes[k] || []
+        asset_classes[k].push({value: value, currency: 'USD'})
       })
-
 
       // === Add asset classes to list ==
       
@@ -56,22 +46,26 @@ acct.registerReport({
         })
       })
 
-      //  === Build Table ===
-      assets.sort(function(a, b){
-        return (b.value) - (a.value)
-      })
+      var total_worth = assets.map( (x) => table.sumCurrencyValues(x.value))
+                              .map( (x) => x.value )
+                              .reduce( (x, y) => x + y, 0)
 
       _.each(assets, function(x){
+        var tot = table.sumCurrencyValues(x.value)
         data.push({
             asset_class: x.cls
-          , value: [{value: x.value}]
-          , proportion: x.value / total_worth
+          , value: tot 
+          , proportion: tot.value / total_worth
         })
+      })
+
+      data.sort(function(a, b){
+        return (b.value.value) - (a.value.value)
       })
 
       var t = table.createTable([
         {title : "Asset Class", property: 'asset_class'}
-      , {title: "Current Value", property:'value', format:'multicurrency'}
+      , {title: "Current Value", property:'value', format:'currency'}
       , {title : "Proportion", property: 'proportion', format: 'percent'}
       ], data)
 
