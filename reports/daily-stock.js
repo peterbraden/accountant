@@ -1,5 +1,4 @@
-var request = require('request')
-  , _ = require('underscore')
+var _ = require('underscore')
   , colors = require('colors')
   , Table = require('cli-table')
   , ac = require('../accountant')  

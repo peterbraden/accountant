@@ -57,28 +57,31 @@ exports.stockGain = function(stock){
 }
 
 
-var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
+var FINANCE_URL ='https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&apikey=V6SYILY9FKBD0YKI&symbol='
 exports.loadPrices = function(stocks, cb){
   if (Object.keys(stocks).length == 0){
     return cb({})
   }
-  request.get({uri:FINANCE_URL + _(stocks).keys().join(',')}, function(err, resp, body){
+  var count = 0;
+  _(stocks).keys().forEach(function(symbol, i){
+    request.get({uri:FINANCE_URL + symbol}, function(err, resp, body){
+      if (err) throw err
       if (!body) throw "Could not get data from API"
-
-      try {
-        var finances = JSON.parse(body.slice(3))
-      } catch (e){
-        console.log("Error parsing API Response:", body)
+      var finances = JSON.parse(body)
+      var data = finances["Time Series (Daily)"]
+      var dates = Object.keys(data || {})
+      dates.sort()
+      var latest = dates.pop()
+      var prev = dates.pop()
+      stocks[symbol].current = data[latest]["4. close"]
+      stocks[symbol].change = data[latest]["4. close"] - data[prev]["4. close"]
+      stocks[symbol].change_percent = stocks[symbol].change / stocks[symbol].current
+      count++
+      if (count == Object.keys(stocks).length) {
+        cb(stocks)
       }
-
-       _.each(finances, function(v, k){
-         stocks[v.t].current = v.l_cur.replace('\$', '').replace(',', '')
-         stocks[v.t].change = v.c
-         stocks[v.t].change_percent = v.cp
-       })
-
-       cb(stocks)
     })
+  })
 }
 
 

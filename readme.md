@@ -59,7 +59,7 @@ ie:
 ]
 ```
 
-See: [examples.json](./examples.json)
+See: [example json](./example-accounts.json)
 
 
 ## Transaction Types:
