@@ -1,26 +1,23 @@
-var Table = require('cli-table')
+var table = require('../lib/table')
   , _ = require('underscore')
   , ac = require('../accountant') 
+  , utils = require('../utils')
 
-var COLS = {
-    asset : {title : "Asset", ind : 0}
-  , cbval : {title : "CB Val", ind : 1}
-  , val : {title: "Curr Val", ind: 2}
+var COLS = [
+  {title : "Asset", property: 'asset'}
+, {title : "CB Val", property: 'costbasis'}
+, {title: "Curr Val", property: 'value'}
   //, cbprop: {title : "CB % Equity", ind: 2}
-  , cbpropnet: {title : "CB % Net", ind: 3}
-  , valpropnet: {title : "Val % Net", ind: 4}
-}  
+, {title : "CB % Net", property: 'costbasisPerNet'}
+, {title : "Val % Net", property: 'valuePerNet'}
+] 
   
 module.exports = function(opts){
   return {
-    onComplete: function(banks, stocks){
-      ac.loadPrices(stocks, function(stocks){
-
-      var t = new Table({
-          head : _.map(COLS, function(v, k){return v.title})
-        , style : {compact: true, 'padding-left':1, head: ['cyan']} 
-      })
-
+    onComplete: function(ev, state){
+      var data = []
+      var banks = state.banks, stocks = state.stocks
+      utils.loadPrices(stocks, function(stocks){
 
       var assets = []
         , net_worth = 0
@@ -39,35 +36,44 @@ module.exports = function(opts){
       assets.push({
           symbol: "Cash".yellow
         , current: 1
-        , cost_basis: cash
-        , quantity: cash
+        , costbasis: cash
+        , position: cash
       })
 
       _.each(stocks, function(s, symbol){
         s.symbol = symbol  
         s.equity = true
         assets.push(s);
-        net_worth += s.cost_basis
-        net_equity += s.cost_basis
-        total_worth += s.current * s.quantity
+        net_worth += s.costbasis
+        net_equity += s.costbasis
+        total_worth += s.current * s.position
 
       })
 
       assets.sort(function(a, b){
-        return (b.current*b.quantity) - (a.current*a.quantity)
+        return (b.current*b.position) - (a.current*a.position)
       })
 
       _.each(assets, function(x){
-        t.push([x.symbol
-          , ac.c(x.cost_basis)
-          //, x.equity ? ac.c(x.cost_basis/net_equity*100) : '-'
-          , ac.c(x.current * x.quantity)
-          , ac.c(x.cost_basis/net_worth*100)
-          , ac.c(x.current*x.quantity/total_worth*100)
-          ])
+        data.push({
+          asset: x.symbol
+        , costbasis: utils.c(x.costbasis)
+        , equity: x.equity ? utils.c(x.costbasis/net_equity*100) : '-'
+        , value: utils.c(x.current * x.position)
+        , costbasisPerNet: utils.c(x.costbasis/net_worth*100)
+        , valuePerNet: utils.c(x.current*x.position/total_worth*100)
+        })
       })
 
-      console.log(t.toString());
+      if (opts.format == 'csv') {
+        console.log('asset, cost basis, number')
+        assets.forEach(function (asset) {
+          console.log(asset.symbol, ', ', asset.cost_basis / asset.position, ', ', asset.position)
+        
+        })
+      } else {
+        console.log(table.createTable(COLS, data).toString())
+      }
 
     })
     }

@@ -1,0 +1,3 @@
+# 0.6.0
+BREAKING:
+- 'acct' changed to 'account' in file format typs for consistency

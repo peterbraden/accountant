@@ -8,4 +8,12 @@ acct.registerReport(report({
   , showDividends : opts.dividends
   , showStock : opts.stock
   , expanded : opts.expanded
-})).run(opts[0]);  
+  , account : opts.account
+})).registerReport({
+  onStart: function(e, state){
+    //state.silent = true
+  },
+  onComplete: function(e, state){
+    //console.log(state.errors)
+  }
+}).runFile(opts[0]);  

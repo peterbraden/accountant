@@ -1,26 +1,36 @@
 // This is an accounts.json file - it's just json but you can use comments
 
-[ {"date" : "2012-01-02", "typ" : "statement", "acct" : "mybank", "balance" : 0, "currency" : "USD"}
+[ 
+  {"date" : "2012-01-02", "typ" : "statement", "account" : "mybank", "balance" : 0, "currency" : "USD"}
+, {"date" : "2012-01-02", "typ" : "statement", "account" : "myforeignbank", "balance" : 0, "currency" : "GBP"}
 
 // The basic typ's are transaction and statement.
-, {"date" : "2012-01-03", "typ" : "transaction", "src" : "myjob",  "dest" : "mybank", "amount" : 1000.01, "currency" : "USD"}
-, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "foo", "amount" : 20, "currency" : "USD"}
+, {"date" : "2012-01-03", "typ" : "transaction", "src" : "myjob-evilcorp",  "dest" : "mybank", "amount" : 1000.01, "currency" : "USD", "note": "Salary"}
+, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "foocorp", "amount" : 20, "currency" : "USD"}
 
-, {"date" : "2012-01-03", "typ" : "transaction", "src" : "myjob",  "dest" : "mybank", "amount" : 3000, "currency" : "USD"}
-, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "foo", "amount" : 10.99, "currency" : "USD"}
-, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "foo", "amount" : 51.50, "currency" : "USD"}
-, {"date" : "2012-01-04", "typ" : "statement", "acct" : "mybank", "balance" : 917.52, "currency" : "USD"}
-, {"date" : "2012-01-04", "typ" : "statement", "acct" : "mybank", "balance" : 3917.52, "currency" : "USD"}
+, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "barcorp", "amount" : 10.99, "currency" : "USD"}
+, {"date" : "2012-01-04", "typ" : "transaction", "src" : "mybank",  "dest" : "bazcorp", "amount" : 51.50, "currency" : "USD"}
+, {"date" : "2012-02-05", "typ" : "statement", "account" : "mybank", "balance" : 917.52, "currency" : "USD"}
+, {"date" : "2012-02-05", "typ" : "transaction", "src" : "myjob-evilcorp",  "dest" : "mybank", "amount" : 3000, "currency" : "USD"}
+, {"date" : "2012-02-05", "typ" : "transaction", "src" : "foreign-place",  "dest" : "myforeignbank", "amount" : 3000, "currency" : "GBP"}
+, {"date" : "2012-02-05", "typ" : "statement", "account" : "mybank", "balance" : 3917.52, "currency" : "USD"}
 
 // You can also record stocks and ETFs:
-, {"date" : "2012-01-04", "typ" : "stock-buy", "symbol" : "MCD", "quantity" : 10, "cost" : 95.94, "commission" : 10, "acct" : "mybank", "asset_class" : "US Stock"}
-, {"date" : "2012-01-04", "typ" : "etf-buy", "symbol" : "BND", "quantity" : 10, "cost" : 83.73, "commission" : 10, "acct" : "mybank", "asset_class" : "Bonds"}
-, {"date" : "2012-01-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "acct" : "mybank", "asset_class" : "US Stock Fund"}
-, {"date" : "2012-02-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "acct" : "mybank", "asset_class" : "US Stock Fund"}
-, {"date" : "2012-03-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "acct" : "mybank", "asset_class" : "US Stock Fund"}
-, {"date" : "2012-04-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "acct" : "mybank", "asset_class" : "US Stock Fund"}
+, {"date" : "2012-03-04", "typ" : "stock-buy", "symbol" : "MCD", "quantity" : 10, "cost" : 95.94, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock"}
+, {"date" : "2012-03-04", "typ" : "etf-buy", "symbol" : "BND", "quantity" : 10, "cost" : 83.73, "commission" : 10, "account" : "mybank", "asset_class" : "Bonds"}
+, {"date" : "2012-03-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
+, {"date" : "2012-03-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
+, {"date" : "2012-03-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
+, {"date" : "2012-04-04", "typ" : "etf-buy", "symbol" : "VTI", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
+, {"date" : "2012-04-04", "typ" : "mutfund-buy", "symbol" : "VTSAX", "quantity" : 10, "cost" : 60, "commission" : 10, "account" : "mybank", "asset_class" : "US Stock Fund"}
+, {"date" : "2013-05-17", "typ" : "etf-sell", "symbol" : "BND", "quantity" : 5, "price" : 89.73, "commission" : 10, "account" : "mybank"}
+, {"date" : "2013-05-17", "typ" : "sell", "symbol" : "VTI", "quantity" : 25, "price" : 70, "commission" : 10, "account" : "mybank"}
+, {"date" : "2013-05-17", "typ": "dividend", "symbol": "VTI", "gross": 12.35, "currency": "USD", "status": "paid", "account": "mybank"}
+, {"date" : "2013-05-18", "typ": "brokerage-statement", "account": "mybank",
+    "holdings": {}
+  }
 
-
-, {"date" : "2013-05-17", "typ" : "etf-sell", "symbol" : "BND", "quantity" : 5, "price" : 89.73, "commission" : 10, "acct" : "mybank"}
-, {"date" : "2013-05-17", "typ" : "sell", "symbol" : "VTI", "quantity" : 25, "price" : 70, "commission" : 10, "acct" : "mybank"}
+// More transactions
+, {"date" : "2013-06-17", "typ" : "transaction", "src" : "myjob-evilcorp",  "dest" : "mybank", "amount" : 3000, "currency" : "USD"}
+, {"date" : "2013-06-17", "typ" : "transaction", "src" : "mybank",  "dest" : "bazcorp", "amount" : 51.50, "currency" : "USD"}
 ]

@@ -1,10 +1,10 @@
 var acct = require('../accountant')
   , stock = require('../reports/daily-stock')
   , ls = require('../reports/list-account')
-  
-  
+  , holdings = require('../reports/holdings')
+  , yearly = require('../reports/yearly')
+  , mix = require('../scripts/mix')
 var smokeopts = {0 : './example-accounts.json'}  
-  
 acct.registerReport(stock({}))
 acct.registerReport(ls({
     showTransactions : true
@@ -12,5 +12,8 @@ acct.registerReport(ls({
   , showStock : true
   , expanded : true
 }))
+acct.registerReport(holdings({}))
+acct.registerReport(yearly)
+acct.registerReport(mix)
 
-acct.run(smokeopts[0])
+acct.runFile(smokeopts[0])

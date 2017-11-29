@@ -1,16 +1,14 @@
-var request = require('request')
-  , _ = require('underscore')
+var _ = require('underscore')
   , colors = require('colors')
   , Table = require('cli-table')
   , ac = require('../accountant')  
+  , utils = require('../utils')
 
-var FINANCE_URL ='http://www.google.com/finance/info?client=ig&q='
-  , EXCHANGE_RATES = {
+var EXCHANGE_RATES = {
       USD : 1 // To USD
     , GBP : 1.5723 
   
   }
-  
 
 var COLS = {
     symbol : {title : "Sym", desc: "Symbol", ind : 0}
@@ -30,28 +28,21 @@ var COLS = {
 }
 		
 module.exports = function(opts){
-			
   return {
-  onComplete: function(banks, stocks){
-  ac.loadPrices(stocks, function(st){
-    render(banks, st, opts)
-  })
+  onComplete: function(ev, state){
 
+    var banks = state.banks, stocks = state.stocks
+    utils.loadPrices(stocks, function(st){
+      render(banks, st, opts)
+    })
 
+    }
   }
 }
-}
-		
-
-
-
-
 
 var render = function(banks, stocks, opts){
-  
-  
   var c = function(v, pre, post){
-    var val = '' + ac.r2(v)
+    var val = '' + utils.r2(v)
       , str = (pre || '') + val + (post || '')
 
     if (opts.color != false)
@@ -79,8 +70,8 @@ var render = function(banks, stocks, opts){
   })
  
   var MKT_RET = _.find(stocks, function(v,k){
-    return (k =='VTI')} )|| {quantity : 1, current : 0, dividend : 0, cost_basis: 0}
-  MKT_RET = (MKT_RET.quantity * MKT_RET.current + MKT_RET.dividend - MKT_RET.cost_basis)/MKT_RET.cost_basis * 100
+    return (k =='VTI')} )|| {position: 1, current : 0, dividend : 0, costbasis: 0}
+  MKT_RET = (MKT_RET.position* MKT_RET.current + MKT_RET.dividend - MKT_RET.costbasis)/MKT_RET.costbasis * 100
 
   var mktCol = function(val){
     if (opts.color!=false && val > 0 && val < MKT_RET){
@@ -91,10 +82,13 @@ var render = function(banks, stocks, opts){
 
   t.push.apply(t, _.map(stocks, function(v, k){
     
-    var age = ac.stockMaxAge(v)
-      , gain = ac.stockGain(v)
-      , ret = (gain + v.dividend)/v.cost_basis
-      
+    var age = null
+      , gain = utils.stockGain(k, v, stocks)
+      , ret = (gain + v.dividend)/v.costbasis
+    
+    if (v.maxAge) {
+      age = parseInt((new Date() - new Date(v.maxAge)) / (1000 * 60 * 60 * 24))
+    }
       /*
       _.each(v.chunks, function(ch){
         ac.historic.priceAt('VTI', ch.date, function(){
@@ -108,19 +102,22 @@ var render = function(banks, stocks, opts){
     , price:  c(v.current)
     , chg: cv(parseFloat(v.change), '', '', (-0.02 * v.current))
     , chg_p: cv(v.change_percent, '', '%', -2)
-    , d_gain: cv(parseFloat(v.change) * v.quantity, '', '', (-0.02 * v.current * v.quantity))
-    , num: c(v.quantity)
-	  , age: v.chunks && ((age + '')[(age < 365) ? 'yellow' : 'green']) || ''
-    , cb: c(v.cost_basis)
-    , mkt: c(v.quantity * v.current)
+    , d_gain: cv(parseFloat(v.change) * v.position, '', '', (-0.02 * v.current * v.position))
+    , num: c(v.position)
+	  , age: age || '-'
+    , cb: c(v.costbasis)
+    , mkt: c(v.position* v.current)
     , div: c(v.dividend)
     , gain: c(gain)
-    , growth: c((v.quantity * v.current - v.cost_basis)/v.cost_basis * 100)
+    , growth: c((v.position* v.current - v.costbasis)/v.costbasis * 100)
     , ret: mktCol(ret * 100)
 	  }
     
-    vals.sec = c(((gain + v.dividend)/ age * 30) / v.cost_basis * 100)
+    vals.sec = c(((gain + v.dividend)/ age * 30) / v.costbasis * 100)
 
+    if ( age == 0 ) {
+      vals.sec = ''
+    }
   
     return _.map(COLS, function(v, k){return vals[k]})
   }))
@@ -163,7 +160,7 @@ var render = function(banks, stocks, opts){
   var stripcolor = /\u001b\[\d+m/g
     , parse = function(a){return parseFloat(("" + a).replace(stripcolor,'')) || 0}
     , sum = function(a,b){return parse(a)+parse(b)}
-    , sumCol = function(col){return _.reduce(_.pluck(t, COLS[col].ind), sum)}
+    , sumCol = function(col){return _.reduce(_.pluck(t, COLS[col].ind), sum, 0)}
     , num_rows = t.length
     
     // Sort
@@ -179,7 +176,7 @@ var render = function(banks, stocks, opts){
       , chg: ""
       , chg_p: cv((sumCol('chg_p') / num_rows), '', '%')  //tot change %
       , d_gain: c(sumCol('d_gain'))
-      , num: ""
+      , num: c(sumCol('num'))
    	  , age: ""
       , cb: c(sumCol('cb'))
       , mkt: c(sumCol('mkt'))
@@ -192,25 +189,15 @@ var render = function(banks, stocks, opts){
   
   t.push([], _.map(COLS, function(v, k){return tots[k]}))
 
-  
-
   console.log(t.toString())
-  
-  
+
   // Trading Accounts
   if (opts.trad_acct){
     _.each(banks, function(v, k){
       if (!v.trading) return;
-      
-      
-      
       console.log(k, ":", v.currency, c(v.balance));
-      
     })  
   
   }  
-  
-  
-  
 }  
 

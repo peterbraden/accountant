@@ -1,74 +1,72 @@
-var request = require('request')
-  , _ = require('underscore')
-  , Table = require('cli-table')
+var  _ = require('underscore')
   , ac = require('../accountant') 
-  , vals = []
-  , c = ac.c
-  , $$ = ac.$
+  , table = require('../lib/table')
+  , convertToUSD = require('../lib/exchange').convertToUSD
 
-var EXCHANGE_RATES = {
-      USD : 1 // To USD
-    , GBP : 1.5723 
-}
 
 module.exports = function(opts){
   return {
 
-  onComplete: function(banks, stocks){
-    ac.loadPrices(stocks, function(stocks){
-    var t = new Table({
-        head : ["Account", "Value ($)", "Liquid ($)", "Unrealised ($)", "Total ($)", "% Net"]
-      , style : {compact: true, 'padding-left':1, head: ['cyan']}
-    })
+  onComplete: function(ev, state){
+    var banks = state.banks
+      , stocks = state.stocks
+      , data = []
+      , tot_tot = 0
 
-    _.each(banks, function(v, k){
-      if (!v.last_statement)
-        return;
+    ac.utils.loadPrices(stocks, function(stocks){
+      _.each(banks, function(bank, k){
+        var row = {
+          account: k
+        , balance: { value: bank.balance, currency: bank.currency }
+        , liquid: { value: bank.balance, currency: bank.currency }
+        , unrealised: { value: 0, currency: bank.currency }
+        , illiquid: {value: 0, currency: bank.currency }
+        }
 
-      var age = parseInt((new Date().getTime() - new Date(v.last_statement).getTime())/(1000*3600*24))
-        , dollar_balance = v.balance
-        , liquid = v.balance
-        , unrealised_gain = 0
-        , positions = v.positions || {}
+        if (!bank.last_statement)
+          return;
 
-      _.each(stocks, function(v, k){
-        if (!positions[k]) return;
-        var _cb = (v.cost_basis / v.quantity) * positions[k]
-        dollar_balance += _cb
-        unrealised_gain += (ac.stockGain(v) / v.quantity) * positions[k];
+        var age = parseInt((new Date().getTime() - new Date(bank.last_statement).getTime())/(1000*3600*24))
+
+        _.each(bank.equities, function(s, k){
+          row.balance.value += s.costbasis 
+          row.illiquid.value += s.costbasis 
+          row.unrealised.value += ac.utils.stockGain(k, s, stocks);
+        })
+
+        if (age > 60){
+          row.account = row.account.red
+        } else if (age > 30){
+          row.account = row.account.yellow
+        }
+        if (!row.balance.value && !row.unrealised.value && !bank.equities)
+          return false;
+
+        tot_tot += convertToUSD(row.unrealised) + convertToUSD(row.liquid) + convertToUSD(row.illiquid)
+
+        if (row.liquid.value + row.illiquid.value + row.unrealised.value == 0){
+          return
+        }
+        data.push(row)
       })
 
-      dollar_balance = dollar_balance * EXCHANGE_RATES[v.currency || 'USD']
-      liquid = liquid * EXCHANGE_RATES[v.currency || 'USD']
-      unrealised_gain = unrealised_gain * EXCHANGE_RATES[v.currency || 'USD']
-
-      if (age > 60){
-        k = k.red
-      } else if (age > 30){
-        k = k.yellow
+      var grandTotal = (tot) => {
+        return (col, row) => {
+          return row.total.value / tot
+        }
       }
-      if (!v.balance && !unrealised_gain)
-        return false;
 
-      vals.push([k, dollar_balance, liquid, unrealised_gain])
+      console.log(table.createTable(
+        [
+        {title: "Account", property: 'account'}
+      , {title: "Value", property: 'balance', format: 'currency', total: true}
+      , {title: "Illiquid", property: 'illiquid', format: 'currency', total: true}
+      , {title: "Liquid", property: 'liquid', format: 'currency', total: true}
+      , {title: "Unrealised", property: 'unrealised', format: 'currency', total: true}
+      , {title: "Total", property: 'total', value: table.sumProperties('illiquid', 'liquid', 'unrealised'), format: 'currency', total: true}
+      , {title: "% Net", property: 'proportionNet', format: 'percent', value: grandTotal(tot_tot)}
+      ], data).toString())
     })
-
-
-    var tot_val = _.reduce(_.pluck(vals, 1), function(x, y){return x+y}, 0)
-      , tot_liq= _.reduce(_.pluck(vals, 2), function(x, y){return x+y}, 0)
-      , tot_ur = _.reduce(_.pluck(vals, 3), function(x, y){return x+y}, 0)
-      , tot_tot = tot_val + tot_ur
-
-    _.each(vals, function(v){
-      t.push([v[0], $$(v[1]), $$(v[2]), $$(v[3]), $$(v[1] + v[3]), c((v[1] + v[3]) /tot_tot*100)])
-    })
-    t.push([]);
-    t.push(['Total', $$(tot_val), $$(tot_liq), $$(tot_ur), $$(tot_tot), '']);
-
-    console.log(t.toString())
-
-
-  })
   }
 }
 }
