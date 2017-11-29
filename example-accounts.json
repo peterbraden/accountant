@@ -34,3 +34,4 @@
 , {"date" : "2013-06-17", "typ" : "transaction", "src" : "myjob-evilcorp",  "dest" : "mybank", "amount" : 3000, "currency" : "USD"}
 , {"date" : "2013-06-17", "typ" : "transaction", "src" : "mybank",  "dest" : "bazcorp", "amount" : 51.50, "currency" : "USD"}
 ]
+, {"date": "2011-09-15", "typ": "dividend", "symbol": "TAP",  "currency": "USD", "gross": 2.88, "status": "paid", "account": "zecco-trading"}
